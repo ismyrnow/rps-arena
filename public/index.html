@@ -17,43 +17,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
   </head>
   <body>
-    <div
-      class="min-h-screen flex items-center justify-center p-4 sm:p-6 lg:p-8"
-    >
-      <div class="w-full max-w-lg">
-        <div class="flex flex-col items-center justify-center min-h-[50vh]">
-          <h2 class="text-3xl sm:text-4xl font-bold mb-6 text-center">
-            Waiting for opponent...
-          </h2>
-          <p class="text-base-content/70 text-lg sm:text-xl mb-8 text-center">
-            Looking for someone to battle with
-          </p>
-          <span class="loading loading-dots loading-lg"></span>
-        </div>
-      </div>
-    </div>
-    <script src="/socket.io/socket.io.js"></script>
-    <script type="text/javascript">
-      // Retrieve player ID from local storage (or create one if it doesn't exist)
-      let playerId = window.localStorage.getItem("rps_playerId");
-
-      if (!playerId) {
-        playerId = `player-${Math.random().toString(36).substr(2, 9)}`;
-        window.localStorage.setItem("rps_playerId", playerId);
-      }
-
-      // Set up socket.io
-      const socket = io(`http://localhost:3000`);
-
-      async function joinLobby() {
-        console.log("Joining lobby as", playerId);
-        socket.emit("lobby:join", playerId);
-        console.log("Joined lobby, waiting for match...");
-      }
-
-      socket.on("connect", () => {
-        joinLobby();
-      });
-    </script>
+    <div id="root"></div>
+    <script src="../src/client/index.tsx" type="module"></script>
   </body>
 </html>

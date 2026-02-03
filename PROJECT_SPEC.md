@@ -6,9 +6,10 @@ A real-time multiplayer rock-paper-scissors web game where players are automatic
 
 ## Technical Stack
 
-- **Backend**: Hono
-- **Transport**: Socket.io
-- **Frontend**: Vanilla HTML/CSS/JS
+- **Runtime**: Bun
+- **Backend**: Bun.serve() with native WebSockets
+- **Frontend**: React 18 with TypeScript
+- **Styling**: Tailwind CSS + DaisyUI
 - **Database**: Memory
 - **Container**: Docker
 
@@ -74,4 +75,4 @@ TODO
 
 ---
 
-**Last Updated**: January 30, 2026
+**Last Updated**: February 3, 2026
