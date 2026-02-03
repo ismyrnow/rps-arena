@@ -1,0 +1,92 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+
+# Diagnostic reports (https://nodejs.org/api/report.html)
+.report/
+# Caching
+.next/
+.nuxt/
+.vercel/
+.idea/
+.vscode/
+*.tsbuildinfo
+.eslintcache
+
+# Dependencies
+node_modules/
+/jspm_packages/
+
+# TypeScript cache
+*.tsbuildinfo
+
+# Optional npm cache directory
+.npm
+.yarn
+
+# dotenv environment variables file
+.env
+.env.development.local
+.env.test.local
+.env.production.local
+.env.local
+
+# Compiled output
+/dist
+/build
+/out
+
+# Editor directories and files
+.idea
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.bak
+*.swp
+*~.nib
+.DS_Store
+.gitattributes
+.gitkeep
+.gitmodules
+.npmrc
+.prettierrc
+.prettierignore
+.editorconfig
+.husky
+.lintstagedrc
+.size-limit.json
+.travis.yml
+.gitlab-ci.yml
+.circleci
+.nyc_output
+.coverage
+.nyc_output
+.coverage
+.cache
+.next
+.nuxt
+.output
+.temp
+.tmp
+.yarn
+.pnpm-store
+.pnpm-lock.yaml
+.npm-cache
+.env.local
+.env.development
+.env.test
+.env.production
+.env.staging
+.env.production.local
+.env.development.local
+.env.test.local
+.env.staging.local
+.DS_Store
+Thumbs.db
