@@ -1,4 +1,10 @@
 import { useEffect, useState } from "react";
+import {
+  getOrCreatePlayerId,
+  buildWebSocketUrl,
+  createMessage,
+  parseMessage,
+} from "./utils";
 
 export default function App() {
   const [socket, setSocket] = useState<WebSocket | null>(null);
@@ -7,30 +13,26 @@ export default function App() {
 
   useEffect(() => {
     // Retrieve player ID from local storage (or create one if it doesn't exist)
-    let storedPlayerId = window.localStorage.getItem("rps_playerId");
-
-    if (!storedPlayerId) {
-      storedPlayerId = `player-${Math.random().toString(36).substr(2, 9)}`;
-      window.localStorage.setItem("rps_playerId", storedPlayerId);
-    }
-
+    const storedPlayerId = getOrCreatePlayerId();
     setPlayerId(storedPlayerId);
 
     // Set up native WebSocket
-    const ws = new WebSocket(
-      `ws://localhost:3000/ws?playerId=${storedPlayerId}`,
-    );
+    const ws = new WebSocket(buildWebSocketUrl(storedPlayerId));
 
     ws.onopen = () => {
       console.log("Connected to server");
       setIsConnected(true);
       console.log("Joining lobby as", storedPlayerId);
-      ws.send(JSON.stringify({ type: "lobby:join", playerId: storedPlayerId }));
+      ws.send(createMessage("lobby:join", { playerId: storedPlayerId }));
       console.log("Joined lobby, waiting for match...");
     };
 
     ws.onmessage = (event) => {
-      const data = JSON.parse(event.data);
+      const data = parseMessage(event.data);
+      if (!data) {
+        console.warn("Received invalid message from server");
+        return;
+      }
       console.log("Received:", data);
     };
 

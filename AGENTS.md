@@ -29,7 +29,19 @@ To run the application, use one of the following commands:
 
 ### Test
 
-There are currently no test commands configured for this project.
+To run the tests, use the following command:
+
+```bash
+npm run test
+```
+
+This uses Bun's built-in test runner. Tests are located in `src/__tests__/` and follow the `*.test.ts` naming convention.
+
+To run tests in watch mode during development:
+
+```bash
+npm run test:watch
+```
 
 ## Code Style Guidelines
 
@@ -43,7 +55,7 @@ The project also uses TypeScript with strict type checking enabled. Please ensur
 
 ## Testing Instructions
 
-There is no testing framework set up for this project yet. When adding new features, please also add corresponding tests. If you are the first one to add tests, please set up a testing framework (e.g., Jest, Vitest).
+This project uses Bun's built-in test runner. When adding new features, please also add corresponding tests in `src/__tests__/`. Test files should be named `*.test.ts`.
 
 ## Security Considerations
 
