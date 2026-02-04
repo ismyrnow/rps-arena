@@ -5,11 +5,18 @@ import {
   createMessage,
   parseMessage,
 } from "./utils";
+import Connecting from "./Connecting";
+import Lobby from "./Lobby";
+import Matched from "./Matched";
+import Abandoned from "./Abandoned";
 
 export default function App() {
   const [socket, setSocket] = useState<WebSocket | null>(null);
   const [playerId, setPlayerId] = useState<string>("");
   const [isConnected, setIsConnected] = useState(false);
+  const [status, setStatus] = useState<
+    "connecting" | "lobby" | "matched" | "abandoned"
+  >("connecting");
 
   useEffect(() => {
     // Retrieve player ID from local storage (or create one if it doesn't exist)
@@ -22,6 +29,7 @@ export default function App() {
     ws.onopen = () => {
       console.log("Connected to server");
       setIsConnected(true);
+      setStatus("lobby");
       console.log("Joining lobby as", storedPlayerId);
       ws.send(createMessage("lobby:join", { playerId: storedPlayerId }));
       console.log("Joined lobby, waiting for match...");
@@ -39,6 +47,7 @@ export default function App() {
     ws.onclose = () => {
       console.log("Disconnected from server");
       setIsConnected(false);
+      setStatus("connecting");
     };
 
     ws.onerror = (error) => {
@@ -53,23 +62,11 @@ export default function App() {
   }, []);
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 sm:p-6 lg:p-8">
-      <div className="w-full max-w-lg">
-        <div className="flex flex-col items-center justify-center min-h-[50vh]">
-          <h2 className="text-3xl sm:text-4xl font-bold mb-6 text-center">
-            Waiting for opponent...
-          </h2>
-          <p className="text-base-content/70 text-lg sm:text-xl mb-8 text-center">
-            Looking for someone to battle with
-          </p>
-          <span className="loading loading-dots loading-lg"></span>
-          {isConnected && (
-            <p className="text-sm text-base-content/50 mt-4">
-              Player ID: {playerId}
-            </p>
-          )}
-        </div>
-      </div>
-    </div>
+    <>
+      {status === "connecting" && <Connecting />}
+      {status === "lobby" && <Lobby playerId={playerId} />}
+      {status === "matched" && <Matched playerId={playerId} />}
+      {status === "abandoned" && <Abandoned playerId={playerId} />}
+    </>
   );
 }
