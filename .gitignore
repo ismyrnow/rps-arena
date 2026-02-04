@@ -90,3 +90,4 @@ node_modules/
 .env.staging.local
 .DS_Store
 Thumbs.db
+test-results

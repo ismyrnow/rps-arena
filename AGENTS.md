@@ -1,64 +1,31 @@
 # AGENTS.md
 
-This document provides information for AI agents working on this project.
+## Project overview
 
-## Project Overview
+RPS Arena is a real-time multiplayer Rock-Paper-Scissors game meant to be played in a mobile browser. Players are matched in a lobby, select their moves, and see results in real-time.
 
-This project is a real-time multiplayer rock-paper-scissors web game called RPS Arena. Players are matched with opponents in a lobby, make their moves, see the results, and can choose to rematch or return to the lobby.
+## Build and test commands
 
-The backend is built with Bun's native HTTP server and uses Bun's native WebSockets for real-time communication. The frontend is built with React and styled with Tailwind CSS and DaisyUI.
+- Install deps: `bun install`
+- Start dev server: `bun run dev`
+- Run unit tests: `bun run test`
+- Run e2e tests: `bun run test:e2e`
+- Typecheck: `bun run typecheck`
+- Format code: `bun run format`
+- Full check (format + typecheck + unit tests): `bun run check`
 
-## Build and Test Commands
+## Architectural snapshot
+- Backend: Bun native HTTP server + WebSockets, TypeScript
+- Frontend: React 18 + TypeScript, Tailwind CSS + DaisyUI
+- Database: In-memory (no persistence)
+- Containerization: Docker
 
-### Build
-
-To build the project, run the following command:
-
-```bash
-npm run build
-```
-
-This will compile the TypeScript code into JavaScript and output it to the `dist` directory.
-
-### Running the Application
-
-To run the application, use one of the following commands:
-
--   `npm start`: Starts the production server.
--   `npm run dev`: Starts the development server with hot-reloading.
-
-### Test
-
-To run the tests, use the following command:
-
-```bash
-npm run test
-```
-
-This uses Bun's built-in test runner. Tests are located in `src/__tests__/` and follow the `*.test.ts` naming convention.
-
-To run tests in watch mode during development:
-
-```bash
-npm run test:watch
-```
-
-## Code Style Guidelines
-
-This project uses Prettier for code formatting. To format the code, run:
-
-```bash
-npm run format
-```
-
-The project also uses TypeScript with strict type checking enabled. Please ensure that all new code is strongly typed.
-
-## Testing Instructions
-
-This project uses Bun's built-in test runner. When adding new features, please also add corresponding tests in `src/__tests__/`. Test files should be named `*.test.ts`.
-
-## Security Considerations
-
--   **Input Validation**: All data received from clients through WebSocket messages should be validated on the server to prevent malicious input.
--   **Rate Limiting**: Consider implementing rate limiting on API endpoints and Socket.io events to prevent abuse.
--   **Dependencies**: Regularly audit dependencies for known vulnerabilities.
+## Coding guidelines
+- Keep it simple and testable. Favor clarity over cleverness.
+- Use React functional components and hooks.
+- Keep react components focused on UI and delegate game logic to separate modules where appropriate.
+- Server owns game state - clients are mostly dumb terminals that send user actions and render server state.
+- Write unit tests for all non-trivial logic.
+- Use Tailwind CSS for styling, with DaisyUI components where appropriate.
+- Perform a check following major changes: `bun run check` (format + typecheck + unit tests)
+- Code should be idiomatic and consistent with the existing codebase style. Follow patterns already established in the project.

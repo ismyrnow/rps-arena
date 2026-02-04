@@ -4,15 +4,19 @@
   "description": "A real-time rock-paper-scissors game",
   "main": "dist/index.js",
   "scripts": {
-    "start": "bun run dist/index.js",
-    "dev": "bun run build:client && bun --watch src/index.ts",
-    "dev:client": "bun build src/client/index.tsx --outdir ./dist/public --watch",
-    "build": "bun run build:server && bun run build:client",
-    "build:server": "tsc",
     "build:client": "bun build src/client/index.tsx --outdir ./dist/public",
+    "build:server": "tsc",
+    "build": "bun run build:server && bun run build:client",
+    "check": "bun run format && bun run typecheck && bun run test",
+    "dev:client": "bun build src/client/index.tsx --outdir ./dist/public --watch",
+    "dev": "bun run build:client && bun --watch src/index.ts",
     "format": "prettier --write .",
-    "test": "bun test",
-    "test:watch": "bun test --watch"
+    "playwright:test": "playwright test --config=playwright.config.ts",
+    "start": "bun run dist/index.js",
+    "test:e2e": "start-server-and-test dev http://localhost:3000 playwright:test",
+    "test:watch": "bun test src --watch",
+    "test": "bun test src",
+    "typecheck": "tsc --noEmit"
   },
   "keywords": [],
   "author": "",
@@ -22,12 +26,14 @@
     "react-dom": "^18.3.1"
   },
   "devDependencies": {
+    "@playwright/test": "^1.58.1",
     "@types/bun": "latest",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "daisyui": "^5.5.17",
     "prettier": "^3.8.1",
     "tailwindcss": "^4.1.18",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "start-server-and-test": "^2.1.3"
   }
 }
