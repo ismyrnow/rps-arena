@@ -1,5 +1,8 @@
-import { describe, test, expect } from "bun:test";
-import { MatchmakingManager } from "../server/matchmaking";
+import { describe, test, expect, mock } from "bun:test";
+import {
+  MatchmakingManager,
+  type MatchmakingEvent,
+} from "../server/matchmaking";
 
 describe("MatchmakingManager", () => {
   test("adds players to lobby and matches them", () => {
@@ -7,17 +10,15 @@ describe("MatchmakingManager", () => {
       gameIdGenerator: () => "abcd",
     });
 
-    const eventsPlayer1 = manager.addPlayer("player-1");
-    expect(eventsPlayer1.some((event) => event.type === "game:created")).toBe(
-      false,
-    );
+    const gameCreatedListener = mock();
+    manager.on("game:created", gameCreatedListener);
+
+    manager.addPlayer("player-1");
+    expect(gameCreatedListener).not.toHaveBeenCalled();
     expect(manager.getPlayer("player-1")?.room).toBe("lobby");
 
-    const eventsPlayer2 = manager.addPlayer("player-2");
-    const gameCreated = eventsPlayer2.find(
-      (event) => event.type === "game:created",
-    );
-    expect(gameCreated).toBeDefined();
+    manager.addPlayer("player-2");
+    expect(gameCreatedListener).toHaveBeenCalled();
 
     const game = manager.listGames()[0];
     expect(game.id).toBe("game-abcd");
@@ -27,16 +28,23 @@ describe("MatchmakingManager", () => {
 
     expect(manager.getPlayer("player-1")?.room).toBe("game-abcd");
     expect(manager.getPlayer("player-2")?.room).toBe("game-abcd");
+
+    manager.off("game:created", gameCreatedListener);
   });
 
   test("removes player from lobby without affecting games", () => {
     const manager = new MatchmakingManager();
+    const gameUpdatedListener = mock();
+    manager.on("game:updated", gameUpdatedListener);
+
     manager.addPlayer("player-1");
 
-    const events = manager.removePlayer("player-1");
-    expect(events.some((event) => event.type === "game:updated")).toBe(false);
+    manager.removePlayer("player-1");
+    expect(gameUpdatedListener).not.toHaveBeenCalled();
     expect(manager.getPlayer("player-1")).toBeUndefined();
     expect(manager.listGames().length).toBe(0);
+
+    manager.off("game:updated", gameUpdatedListener);
   });
 
   test("marks game abandoned when a player leaves", () => {
@@ -44,16 +52,20 @@ describe("MatchmakingManager", () => {
       gameIdGenerator: () => "wxyz",
     });
 
+    const gameUpdatedListener = mock();
+    manager.on("game:updated", gameUpdatedListener);
+
     manager.addPlayer("player-1");
     manager.addPlayer("player-2");
 
-    const events = manager.removePlayer("player-1");
-    const gameUpdated = events.find((event) => event.type === "game:updated");
-    expect(gameUpdated).toBeDefined();
+    manager.removePlayer("player-1");
+    expect(gameUpdatedListener).toHaveBeenCalled();
 
     const game = manager.getGame("game-wxyz");
     expect(game?.status).toBe("abandoned");
     expect(game?.abandonedBy).toBe("player-1");
+
+    manager.off("game:updated", gameUpdatedListener);
   });
 
   test("deletes game when both players leave", () => {
@@ -61,13 +73,18 @@ describe("MatchmakingManager", () => {
       gameIdGenerator: () => "zzzz",
     });
 
+    const gameDeletedListener = mock();
+    manager.on("game:deleted", gameDeletedListener);
+
     manager.addPlayer("player-1");
     manager.addPlayer("player-2");
 
     manager.removePlayer("player-1");
-    const events = manager.removePlayer("player-2");
+    manager.removePlayer("player-2");
 
-    expect(events.some((event) => event.type === "game:deleted")).toBe(true);
+    expect(gameDeletedListener).toHaveBeenCalled();
     expect(manager.listGames().length).toBe(0);
+
+    manager.off("game:deleted", gameDeletedListener);
   });
 });

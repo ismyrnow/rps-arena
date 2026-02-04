@@ -1,3 +1,5 @@
+import { EventEmitter } from "node:events";
+
 export type RoomId = "lobby" | `game-${string}`;
 
 export type PlayerRecord = {
@@ -26,12 +28,13 @@ type MatchmakingOptions = {
   gameIdGenerator?: () => string;
 };
 
-export class MatchmakingManager {
+export class MatchmakingManager extends EventEmitter {
   private players = new Map<string, PlayerRecord>();
   private games = new Map<GameRecord["id"], GameRecord>();
   private gameIdGenerator: () => string;
 
   constructor(options: MatchmakingOptions = {}) {
+    super();
     this.gameIdGenerator =
       options.gameIdGenerator ?? (() => Math.random().toString(36).slice(2, 6));
   }
@@ -52,7 +55,7 @@ export class MatchmakingManager {
     return Array.from(this.games.values());
   }
 
-  addPlayer(playerId: string): MatchmakingEvent[] {
+  addPlayer(playerId: string): void {
     const events: MatchmakingEvent[] = [];
     const player: PlayerRecord = { id: playerId, room: "lobby" };
     this.players.set(playerId, player);
@@ -67,7 +70,6 @@ export class MatchmakingManager {
     if (lobbyPlayers.length >= 2) {
       const [player1, player2] = lobbyPlayers;
       const game = this.createGame(player1.id, player2.id);
-      events.push({ type: "game:created", game });
 
       events.push({ type: "room:left", playerId: player1.id, room: "lobby" });
       events.push({ type: "room:left", playerId: player2.id, room: "lobby" });
@@ -77,15 +79,16 @@ export class MatchmakingManager {
 
       events.push({ type: "room:joined", playerId: player1.id, room: game.id });
       events.push({ type: "room:joined", playerId: player2.id, room: game.id });
+      events.push({ type: "game:created", game });
     }
 
-    return events;
+    this.emitAll(events);
   }
 
-  removePlayer(playerId: string): MatchmakingEvent[] {
+  removePlayer(playerId: string): void {
     const player = this.players.get(playerId);
     if (!player) {
-      return [];
+      return;
     }
 
     const events: MatchmakingEvent[] = [];
@@ -116,7 +119,13 @@ export class MatchmakingManager {
       }
     }
 
-    return events;
+    this.emitAll(events);
+  }
+
+  private emitAll(events: MatchmakingEvent[]) {
+    for (const event of events) {
+      this.emit(event.type, event);
+    }
   }
 
   private createGame(player1: string, player2: string): GameRecord {

@@ -24,15 +24,12 @@ export class WebSocketService {
       return;
     }
 
-    console.log("WebSocket here1");
     this.playerId = playerId;
     this.statusHandler = onStatus;
     this.messageHandler = onMessage;
 
     this.ws = new WebSocket(url);
     this.statusHandler?.("connecting");
-
-    console.log("WebSocket here3");
 
     this.ws.onopen = () => {
       console.log("WebSocket connection opened for player:", playerId);
