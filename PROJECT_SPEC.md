@@ -94,7 +94,7 @@ Architecture overview:
 - Game logic: `src/server/game.ts` — `GameManager` class manages `players` and `games`, handles matchmaking, gameplay (moves, countdown, reveal, results), rematch, leave, and disconnect. Emits events via `EventEmitter` (`room:joined`, `room:left`, `game:created`, `game:updated`, `game:deleted`).
 - Client: `src/client/*` — React components, `App.tsx` renders UI and subscribes to server channels via a small WebSocket service.
 - Tests: - Unit tests: `src/__tests__/*` (Bun test runner) for pure logic (game manager, utils).
-       - E2E tests: `e2e/*` (Playwright) to exercise full browser flow (matchmaking, gameplay, disconnect).
+  - E2E tests: `e2e/*` (Playwright) to exercise full browser flow (matchmaking, gameplay, disconnect).
 
 File structure (top-level)
 
@@ -114,14 +114,14 @@ File structure (top-level)
 Message contract (high level):
 
 - Client -> Server:
-       - `lobby:join` { playerId }
-       - `move:select` { gameId, move }
-       - `rematch:request` { gameId }
-       - `game:leave` { gameId }
+  - `lobby:join` { playerId }
+  - `move:select` { gameId, move }
+  - `rematch:request` { gameId }
+  - `game:leave` { gameId }
 
 - Server -> Client (published on channels):
-       - `player:joined` / `player:left` (lobby channel)
-       - `game:updated` (game channel, includes full `GameRecord`)
+  - `player:joined` / `player:left` (lobby channel)
+  - `game:updated` (game channel, includes full `GameRecord`)
 
 Match data structures:
 

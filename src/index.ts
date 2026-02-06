@@ -35,21 +35,19 @@ const server = Bun.serve<WebSocketData>({
   },
   websocket: {
     open(ws) {
-      console.log(`Player ${ws.data.playerId} connected`);
+      console.log(`WS: Player ${ws.data.playerId} connected`);
       connections.set(ws.data.playerId, ws);
       gameManager.addPlayer(ws.data.playerId);
     },
     message(ws, message) {
       const data = parseMessage(message.toString());
+
       if (!data) {
-        console.warn(`Invalid message from ${ws.data.playerId}`);
+        console.warn(`WS: Invalid message from ${ws.data.playerId}`);
         return;
       }
-      console.log(`Received from ${ws.data.playerId}:`, data);
 
-      if (data.type === "lobby:join") {
-        console.log(`Player ${ws.data.playerId} joined the lobby`);
-      }
+      console.log(`WS: Received from ${ws.data.playerId}:`, data);
 
       if (data.type === "move:select") {
         const gameId = data.gameId as string;
@@ -75,7 +73,7 @@ const server = Bun.serve<WebSocketData>({
       }
     },
     close(ws) {
-      console.log(`Player ${ws.data.playerId} disconnected`);
+      console.log(`WS: Player ${ws.data.playerId} disconnected`);
       connections.delete(ws.data.playerId);
       gameManager.removePlayer(ws.data.playerId);
     },
@@ -83,10 +81,14 @@ const server = Bun.serve<WebSocketData>({
 });
 
 const handleRoomJoined = (event: GameEvent) => {
-  if (event.type !== "room:joined") return;
-  console.log("Matchmaking event:", event);
-  const ws = connections.get(event.playerId);
-  ws?.subscribe(event.room);
+  if (event.type !== "room:joined") {
+    return;
+  }
+
+  console.log("GM: Room joined:", event);
+
+  const playerSocket = connections.get(event.playerId);
+  playerSocket?.subscribe(event.room);
 
   if (event.room === "lobby") {
     server.publish(
@@ -97,9 +99,14 @@ const handleRoomJoined = (event: GameEvent) => {
 };
 
 const handleRoomLeft = (event: GameEvent) => {
-  if (event.type !== "room:left") return;
-  const ws = connections.get(event.playerId);
-  ws?.unsubscribe(event.room);
+  if (event.type !== "room:left") {
+    return;
+  }
+
+  console.log("GM: Room left:", event);
+
+  const playerSocket = connections.get(event.playerId);
+  playerSocket?.unsubscribe(event.room);
 
   if (event.room === "lobby") {
     server.publish(
@@ -110,7 +117,14 @@ const handleRoomLeft = (event: GameEvent) => {
 };
 
 const handleGameChange = (event: GameEvent) => {
-  if (event.type !== "game:created" && event.type !== "game:updated") return;
+  if (event.type !== "game:created" && event.type !== "game:updated") {
+    return;
+  }
+
+  const eventName =
+    event.type === "game:created" ? "Game created" : "Game updated";
+  console.log(`GM: ${eventName}:`, event);
+
   const game: GameRecord = event.game;
   server.publish(game.id, createMessage("game:updated", { game }));
 };
