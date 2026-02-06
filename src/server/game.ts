@@ -27,6 +27,8 @@ export type GameRecord = {
   winner: string | "draw" | null;
   player1Rematch: boolean;
   player2Rematch: boolean;
+  player1Score: number;
+  player2Score: number;
   abandonedBy: string | null;
 };
 
@@ -244,6 +246,8 @@ export class GameManager extends EventEmitter {
       player2Move: null,
       winner: null,
       player1Rematch: false,
+      player1Score: 0,
+      player2Score: 0,
       player2Rematch: false,
       abandonedBy: null,
     };
@@ -292,7 +296,15 @@ export class GameManager extends EventEmitter {
       winner = result === "player1" ? game.player1 : game.player2;
     }
 
-    const revealed: GameRecord = { ...game, status: "reveal", winner };
+    const revealed: GameRecord = {
+      ...game,
+      status: "reveal",
+      winner,
+      player1Score:
+        winner === game.player1 ? game.player1Score + 1 : game.player1Score,
+      player2Score:
+        winner === game.player2 ? game.player2Score + 1 : game.player2Score,
+    };
     this.games.set(gameId, revealed);
     this.emitAll([{ type: "game:updated", game: revealed }]);
 

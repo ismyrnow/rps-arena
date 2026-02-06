@@ -68,6 +68,10 @@ test.describe("Gameplay flow", () => {
       "You lose!",
     );
 
+    // Scores should be updated
+    await expect(pageA.locator('[data-testid="score"]')).toContainText("1 - 0");
+    await expect(pageB.locator('[data-testid="score"]')).toContainText("0 - 1");
+
     // Rematch and leave buttons should appear
     await expect(pageA.locator('[data-testid="rematch-btn"]')).toBeVisible({
       timeout: 10000,
