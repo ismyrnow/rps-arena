@@ -1,14 +1,10 @@
-import { ServerWebSocket } from "bun";
 import homepage from "../public/index.html";
-import { generatePlayerId, parseMessage, createMessage } from "./client/utils";
+import { generatePlayerId, createMessage } from "./client/utils";
 import { GameManager, type GameRecord, type GameEvent } from "./server/game";
-
-type WebSocketData = {
-  playerId: string;
-};
+import { ConnectionManager, type WebSocketData } from "./server/connection";
 
 const gameManager = new GameManager();
-const connections = new Map<string, ServerWebSocket<WebSocketData>>();
+const connectionManager = new ConnectionManager(gameManager);
 
 const server = Bun.serve<WebSocketData>({
   port: 3000,
@@ -36,46 +32,15 @@ const server = Bun.serve<WebSocketData>({
   websocket: {
     open(ws) {
       console.log(`WS: Player ${ws.data.playerId} connected`);
-      connections.set(ws.data.playerId, ws);
-      gameManager.addPlayer(ws.data.playerId);
+      connectionManager.open(ws);
     },
     message(ws, message) {
-      const data = parseMessage(message.toString());
-
-      if (!data) {
-        console.warn(`WS: Invalid message from ${ws.data.playerId}`);
-        return;
-      }
-
-      console.log(`WS: Received from ${ws.data.playerId}:`, data);
-
-      if (data.type === "move:select") {
-        const gameId = data.gameId as string;
-        const move = data.move as string;
-        gameManager.submitMove(
-          gameId as GameRecord["id"],
-          ws.data.playerId,
-          move as "rock" | "paper" | "scissors",
-        );
-      }
-
-      if (data.type === "rematch:request") {
-        const gameId = data.gameId as string;
-        gameManager.requestRematch(
-          gameId as GameRecord["id"],
-          ws.data.playerId,
-        );
-      }
-
-      if (data.type === "game:leave") {
-        const gameId = data.gameId as string;
-        gameManager.leaveGame(gameId as GameRecord["id"], ws.data.playerId);
-      }
+      console.log(`WS: Received from ${ws.data.playerId}:`, message.toString());
+      connectionManager.message(ws, message);
     },
     close(ws) {
       console.log(`WS: Player ${ws.data.playerId} disconnected`);
-      connections.delete(ws.data.playerId);
-      gameManager.removePlayer(ws.data.playerId);
+      connectionManager.close(ws);
     },
   },
 });
@@ -87,7 +52,7 @@ const handleRoomJoined = (event: GameEvent) => {
 
   console.log("GM: Room joined:", event);
 
-  const playerSocket = connections.get(event.playerId);
+  const playerSocket = connectionManager.getConnection(event.playerId);
   playerSocket?.subscribe(event.room);
 
   if (event.room === "lobby") {
@@ -105,7 +70,7 @@ const handleRoomLeft = (event: GameEvent) => {
 
   console.log("GM: Room left:", event);
 
-  const playerSocket = connections.get(event.playerId);
+  const playerSocket = connectionManager.getConnection(event.playerId);
   playerSocket?.unsubscribe(event.room);
 
   if (event.room === "lobby") {

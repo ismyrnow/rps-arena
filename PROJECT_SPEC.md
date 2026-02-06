@@ -90,7 +90,8 @@ If a player disconnects or leaves during a match, the remaining player is shown 
 Architecture overview:
 
 - Runtime: Bun (server + package manager)
-- Server: `src/index.ts` (Bun.serve) — handles HTTP + WebSocket upgrade, maintains a `connections` map, and publishes updates to channels.
+- Server: `src/index.ts` (Bun.serve) — handles HTTP + WebSocket upgrade, logs connections, and publishes updates to channels.
+- Connection management: `src/server/connection.ts` — `ConnectionManager` class tracks WebSocket connections (private map, exposed via `getConnection`), delegates player registration and message handling to the `GameManager`.
 - Game logic: `src/server/game.ts` — `GameManager` class manages `players` and `games`, handles matchmaking, gameplay (moves, countdown, reveal, results), rematch, leave, and disconnect. Emits events via `EventEmitter` (`room:joined`, `room:left`, `game:created`, `game:updated`, `game:deleted`).
 - Client: `src/client/*` — React components, `App.tsx` renders UI and subscribes to server channels via a small WebSocket service.
 - Tests: - Unit tests: `src/__tests__/*` (Bun test runner) for pure logic (game manager, utils).
@@ -102,6 +103,7 @@ File structure (top-level)
 - `playwright.config.ts` — Playwright configuration (e2e)
 - `e2e/` — Playwright tests (matchmaking and gameplay flows)
 - `src/index.ts` — server entry (Bun.serve)
+- `src/server/connection.ts` — connection manager (WebSocket tracking + message routing)
 - `src/server/game.ts` — game manager (matchmaking + gameplay logic)
 - `src/client/index.tsx` — client entry
 - `src/client/App.tsx` — main React app and UI
