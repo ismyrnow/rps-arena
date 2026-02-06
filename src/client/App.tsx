@@ -108,7 +108,7 @@ export default function App() {
     <>
       {status === "connecting" && <Connecting />}
       {status === "lobby" && <Lobby playerId={playerId} />}
-      {status === "matched" && <Matched playerId={playerId} />}
+      {status === "matched" && <Matched />}
       {isPlaying && (
         <Playing
           playerId={playerId}
@@ -118,7 +118,7 @@ export default function App() {
           onLeave={handleLeave}
         />
       )}
-      {status === "abandoned" && <Abandoned playerId={playerId} />}
+      {status === "abandoned" && <Abandoned />}
     </>
   );
 }

@@ -8,6 +8,7 @@ const connectionManager = new ConnectionManager(gameManager);
 
 const server = Bun.serve<WebSocketData>({
   port: 3000,
+  development: true,
 
   routes: {
     "/": homepage,

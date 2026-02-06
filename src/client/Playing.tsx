@@ -51,7 +51,7 @@ function MoveSelection({
             key={move}
             data-testid={`move-${move}`}
             onClick={() => onMove(move)}
-            className="btn btn-lg btn-outline text-4xl w-20 h-20 sm:w-24 sm:h-24"
+            className="btn btn-xl"
           >
             {MOVE_EMOJI[move]}
           </button>
@@ -91,7 +91,7 @@ function Reveal({ game, playerId }: { game: GameRecord; playerId: string }) {
         : "text-error";
 
   return (
-    <div className="flex flex-col items-center gap-4">
+    <div className="flex flex-col items-center gap-8">
       <h2
         data-testid="result-text"
         className={`text-3xl sm:text-4xl font-bold text-center ${resultClass}`}
@@ -132,27 +132,37 @@ function Finished({
   return (
     <div className="flex flex-col items-center gap-4">
       <Reveal game={game} playerId={playerId} />
-      <div className="flex gap-4 mt-4">
+      <div className="flex mt-4">
         {myRematch ? (
-          <p className="text-lg text-base-content/70">
-            Waiting for opponent...
-          </p>
+          <div className="flex flex-col items-center gap-4">
+            <p className="text-lg text-base-content/70">
+              Waiting for opponent...
+            </p>
+
+            <span className="loading loading-dots loading-lg"></span>
+          </div>
         ) : (
-          <button
-            data-testid="rematch-btn"
-            onClick={onRematch}
-            className="btn btn-primary btn-lg"
-          >
-            Rematch
-          </button>
+          <div className="flex flex-col items-center gap-4">
+            <button
+              data-testid="rematch-btn"
+              onClick={onRematch}
+              className="btn btn-lg"
+            >
+              Rematch
+            </button>
+            <div>
+              or{" "}
+              <a
+                className="link"
+                data-testid="leave-btn"
+                href="#"
+                onClick={onLeave}
+              >
+                return to lobby
+              </a>
+            </div>
+          </div>
         )}
-        <button
-          data-testid="leave-btn"
-          onClick={onLeave}
-          className="btn btn-outline btn-lg"
-        >
-          Leave
-        </button>
       </div>
     </div>
   );
@@ -184,9 +194,6 @@ export default function Playing({
               onLeave={onLeave}
             />
           )}
-          <p className="text-sm text-base-content/50 mt-4">
-            Player ID: {playerId}
-          </p>
         </div>
       </div>
     </div>

@@ -1,6 +1,4 @@
-interface Props {
-  playerId: string;
-}
+interface Props {}
 
 export default function Matched(props: Props) {
   return (
@@ -26,9 +24,6 @@ export default function Matched(props: Props) {
             Get ready to battle!
           </p>
           <span className="loading loading-spinner loading-lg mt-4"></span>
-          <p className="text-sm text-base-content/50 mt-4">
-            Player ID: {props.playerId}
-          </p>
         </div>
       </div>
     </div>

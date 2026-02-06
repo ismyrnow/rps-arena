@@ -1,6 +1,4 @@
-interface Props {
-  playerId: string;
-}
+interface Props {}
 
 export default function Abandoned(props: Props) {
   return (
@@ -27,13 +25,10 @@ export default function Abandoned(props: Props) {
           </p>
           <button
             onClick={() => window.location.reload()}
-            className="btn btn-primary btn-lg w-full sm:w-auto"
+            className="btn btn-lg w-full sm:w-auto"
           >
             Return to Lobby
           </button>
-          <p className="text-sm text-base-content/50 mt-4">
-            Player ID: {props.playerId}
-          </p>
         </div>
       </div>
     </div>
