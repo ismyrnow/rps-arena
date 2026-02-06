@@ -13,7 +13,7 @@
     "format": "prettier --write .",
     "playwright:test": "playwright test --config=playwright.config.ts",
     "start": "bun run dist/index.js",
-    "test:e2e": "start-server-and-test dev http://localhost:3000 playwright:test",
+    "test:e2e": "start-server-and-test dev http://localhost:3000/health playwright:test",
     "test:watch": "bun test src --watch",
     "test": "bun test src",
     "typecheck": "tsc --noEmit"

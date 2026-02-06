@@ -61,12 +61,13 @@ Use Bun for runtime and package management. Examples:
 │Leave Choice │
 └─────┬───┬───┘
       │   │
-      │   └─→ One leaves → Notify other → Lobby
+      │   └─→ One leaves → Notify other (abandoned screen)
+      │                     Leaving player navigates to /
       │
       └─→ Both rematch → Move Selection
 ```
 
-If a player disconnects during a match, the remaining player is shown an abandoned status screen: "Opponent disconnected — return to lobby?" If they confirm, they are returned to the lobby.
+If a player disconnects or leaves during a match, the remaining player is shown an abandoned status screen: "Opponent left — return to lobby?" If they confirm, they are returned to the lobby.
 
 ## Currently Implemented Features
 
@@ -75,11 +76,11 @@ If a player disconnects during a match, the remaining player is shown an abandon
 - Server and client communication via WebSockets (Bun native WebSocket API)
 - Unit and E2E tests (Bun unit tests in `src/__tests__`; Playwright E2E in `e2e/`)
 - Lobby and matchmaking (automatic pairing from lobby into game rooms)
-- Handling opponent disconnect (mark game abandoned and notify remaining player)
+- Game UI and flow (move selection, countdown, reveal, results, rematch, leave)
+- Handling opponent disconnect or leave (mark game abandoned and notify remaining player)
 
 ## Features to Implement
 
-- Game UI and flow (move selection, show results, rematch)
 - Containerization with Docker (single-container deployment)
 - GitHub Actions for tests (unit + E2E pipeline)
 - README (project README with setup, dev, and test instructions)
@@ -90,21 +91,21 @@ Architecture overview:
 
 - Runtime: Bun (server + package manager)
 - Server: `src/index.ts` (Bun.serve) — handles HTTP + WebSocket upgrade, maintains a `connections` map, and publishes updates to channels.
-- Matchmaking: `src/server/matchmaking.ts` — manages `players` and `games`, emits events via `EventEmitter` (`room:joined`, `room:left`, `game:created`, `game:updated`, `game:deleted`).
+- Game logic: `src/server/game.ts` — `GameManager` class manages `players` and `games`, handles matchmaking, gameplay (moves, countdown, reveal, results), rematch, leave, and disconnect. Emits events via `EventEmitter` (`room:joined`, `room:left`, `game:created`, `game:updated`, `game:deleted`).
 - Client: `src/client/*` — React components, `App.tsx` renders UI and subscribes to server channels via a small WebSocket service.
-- Tests:
-       - Unit tests: `src/__tests__/*` (Bun test runner) for pure logic (matchmaking, utils).
-       - E2E tests: `e2e/*` (Playwright) to exercise full browser flow (two contexts, match, disconnect).
+- Tests: - Unit tests: `src/__tests__/*` (Bun test runner) for pure logic (game manager, utils).
+       - E2E tests: `e2e/*` (Playwright) to exercise full browser flow (matchmaking, gameplay, disconnect).
 
 File structure (top-level)
 
 - `package.json` — scripts and devDependencies (Bun + Playwright tooling)
 - `playwright.config.ts` — Playwright configuration (e2e)
-- `e2e/` — Playwright tests (matching flow)
+- `e2e/` — Playwright tests (matchmaking and gameplay flows)
 - `src/index.ts` — server entry (Bun.serve)
-- `src/server/matchmaking.ts` — matchmaking manager and events
+- `src/server/game.ts` — game manager (matchmaking + gameplay logic)
 - `src/client/index.tsx` — client entry
 - `src/client/App.tsx` — main React app and UI
+- `src/client/Playing.tsx` — gameplay UI (move selection, countdown, reveal, results, rematch)
 - `src/client/utils.ts` — helpers (message parsing, player id generation)
 - `src/__tests__/` — unit tests (Bun)
 - `public/index.html` — client HTML shell
@@ -114,20 +115,23 @@ Message contract (high level):
 
 - Client -> Server:
        - `lobby:join` { playerId }
-       - `move:select` { playerId, gameId, move }
+       - `move:select` { gameId, move }
+       - `rematch:request` { gameId }
+       - `game:leave` { gameId }
 
 - Server -> Client (published on channels):
        - `player:joined` / `player:left` (lobby channel)
-       - `game:update` (game channel, includes full `GameRecord`)
+       - `game:updated` (game channel, includes full `GameRecord`)
 
 Match data structures:
 
+- `Move`: `'rock' | 'paper' | 'scissors'`.
 - `PlayerRecord`: `{ id: string; room: RoomId }` where `RoomId` is `lobby` or `game-...`.
-- `GameRecord`: `{ id: string; player1: string; player2: string; status: 'matched'|'abandoned'; abandonedBy: string | null }`.
+- `GameRecord`: `{ id: string; player1: string; player2: string; status: 'matched'|'playing'|'countdown'|'reveal'|'finished'|'abandoned'; player1Move: Move | null; player2Move: Move | null; winner: string | 'draw' | null; player1Rematch: boolean; player2Rematch: boolean; abandonedBy: string | null }`.
 
 Notes:
 
-- Keep game logic in small, testable modules (matchmaking is server-owned).
+- Keep game logic in a single, testable module (`GameManager` owns all state).
 - Use `data-testid` attributes for UI elements you want Playwright to assert.
 - The `test:e2e` script starts the Bun dev server and runs Playwright; Playwright browser install still requires `npx playwright install --with-deps` once.
 
@@ -137,4 +141,4 @@ Notes:
 
 ---
 
-**Last Updated**: February 3, 2026
+**Last Updated**: February 6, 2026

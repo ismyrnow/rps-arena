@@ -20,10 +20,10 @@ export default function Abandoned(props: Props) {
             />
           </svg>
           <h2 className="text-3xl sm:text-4xl font-bold text-center">
-            Opponent disconnected
+            Opponent left
           </h2>
           <p className="text-lg sm:text-xl text-center text-base-content/70 mb-4">
-            Your opponent has left the game
+            Your opponent is no longer in the game
           </p>
           <button
             onClick={() => window.location.reload()}

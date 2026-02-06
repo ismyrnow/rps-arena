@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import {
   getOrCreatePlayerId,
   buildWebSocketUrl,
@@ -10,12 +10,30 @@ import Connecting from "./Connecting";
 import Lobby from "./Lobby";
 import Matched from "./Matched";
 import Abandoned from "./Abandoned";
+import Playing from "./Playing";
+import type { GameRecord, GameStatus, Move } from "../server/game";
+
+type AppStatus =
+  | "connecting"
+  | "lobby"
+  | "matched"
+  | "playing"
+  | "countdown"
+  | "reveal"
+  | "finished"
+  | "abandoned";
+
+const PLAYING_STATUSES: GameStatus[] = [
+  "playing",
+  "countdown",
+  "reveal",
+  "finished",
+];
 
 export default function App() {
   const [playerId, setPlayerId] = useState<string>("");
-  const [status, setStatus] = useState<
-    "connecting" | "lobby" | "matched" | "abandoned"
-  >("connecting");
+  const [status, setStatus] = useState<AppStatus>("connecting");
+  const [gameState, setGameState] = useState<GameRecord | null>(null);
   const wsServiceRef = useRef(wsService);
 
   useEffect(() => {
@@ -36,22 +54,17 @@ export default function App() {
           return;
         }
         console.log("Received:", data);
-        if (data.type === "game:update" && typeof data.game === "object") {
-          const game = data.game as {
-            id: string;
-            player1: string;
-            player2: string;
-            status: "matched" | "abandoned";
-            abandonedBy: string | null;
-          };
+        if (data.type === "game:updated" && typeof data.game === "object") {
+          const game = data.game as GameRecord;
           if (
             game.player1 === storedPlayerId ||
             game.player2 === storedPlayerId
           ) {
-            if (game.status === "matched") {
-              setStatus("matched");
-            } else if (game.status === "abandoned") {
+            setGameState(game);
+            if (game.status === "abandoned") {
               setStatus("abandoned");
+            } else {
+              setStatus(game.status);
             }
           }
         }
@@ -63,11 +76,48 @@ export default function App() {
     };
   }, []);
 
+  const handleMove = useCallback(
+    (move: Move) => {
+      if (!gameState) return;
+      wsServiceRef.current.send(
+        createMessage("move:select", { gameId: gameState.id, move }),
+      );
+    },
+    [gameState],
+  );
+
+  const handleRematch = useCallback(() => {
+    if (!gameState) return;
+    wsServiceRef.current.send(
+      createMessage("rematch:request", { gameId: gameState.id }),
+    );
+  }, [gameState]);
+
+  const handleLeave = useCallback(() => {
+    if (!gameState) return;
+    wsServiceRef.current.send(
+      createMessage("game:leave", { gameId: gameState.id }),
+    );
+    window.location.href = "/";
+  }, [gameState]);
+
+  const isPlaying =
+    PLAYING_STATUSES.includes(status as GameStatus) && gameState;
+
   return (
     <>
       {status === "connecting" && <Connecting />}
       {status === "lobby" && <Lobby playerId={playerId} />}
       {status === "matched" && <Matched playerId={playerId} />}
+      {isPlaying && (
+        <Playing
+          playerId={playerId}
+          game={gameState}
+          onMove={handleMove}
+          onRematch={handleRematch}
+          onLeave={handleLeave}
+        />
+      )}
       {status === "abandoned" && <Abandoned playerId={playerId} />}
     </>
   );
