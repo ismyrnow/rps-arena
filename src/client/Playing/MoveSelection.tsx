@@ -1,4 +1,8 @@
 import type { Move, GameRecord } from "../../server/game";
+import Heading from "../shared/Heading";
+import Heading from "../shared/Heading";
+import LoadingDots from "../shared/LoadingDots";
+import Subheading from "../shared/Subheading";
 import { MOVE_EMOJI, MOVES } from "./constants";
 
 interface Props {
@@ -14,20 +18,16 @@ export default function MoveSelection({ game, playerId, onMove }: Props) {
   if (myMove) {
     return (
       <div className="flex flex-col items-center gap-4">
-        <h2 className="text-3xl sm:text-4xl font-bold text-center">
-          You chose {MOVE_EMOJI[myMove]}
-        </h2>
-        <p className="text-lg text-base-content/70">Waiting for opponent...</p>
-        <span className="loading loading-dots loading-lg"></span>
+        <Heading>You chose {MOVE_EMOJI[myMove]}</Heading>
+        <Subheading>Waiting for opponent...</Subheading>
+        <LoadingDots />
       </div>
     );
   }
 
   return (
     <div className="flex flex-col items-center gap-6">
-      <h2 className="text-3xl sm:text-4xl font-bold text-center">
-        Choose your move
-      </h2>
+      <Heading>Choose your move</Heading>
       <div className="flex gap-4">
         {MOVES.map((move) => (
           <button

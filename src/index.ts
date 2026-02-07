@@ -2,6 +2,7 @@ import homepage from "../public/index.html";
 import { generatePlayerId, createMessage } from "./client/utils";
 import { GameManager, type GameRecord, type GameEvent } from "./server/game";
 import { ConnectionManager, type WebSocketData } from "./server/connection";
+import { BunRequest } from "bun";
 
 const gameManager = new GameManager();
 const connectionManager = new ConnectionManager(gameManager);
@@ -13,22 +14,27 @@ const server = Bun.serve<WebSocketData>({
   routes: {
     "/": homepage,
     "/health": new Response("ok"),
-  },
-
-  fetch(req, server) {
-    const url = new URL(req.url);
-
-    // WebSocket upgrade
-    if (url.pathname === "/ws") {
+    "/ws": (req: BunRequest<"/ws">, server: Bun.Server<WebSocketData>) => {
+      const url = new URL(req.url);
       const playerId = url.searchParams.get("playerId") || generatePlayerId();
 
       if (server.upgrade(req, { data: { playerId } })) {
         return; // Bun returns 101 Switching Protocols automatically
       }
       return new Response("WebSocket upgrade failed", { status: 500 });
+    },
+  },
+
+  fetch(req, server) {
+    const url = new URL(req.url);
+
+    // Serve static files from the public directory
+    const staticFile = Bun.file(`./public${url.pathname}`);
+    if (staticFile.size) {
+      return new Response(staticFile);
     }
 
-    return new Response("Not Found", { status: 404 });
+    return new Response(null, { status: 404 });
   },
   websocket: {
     open(ws) {

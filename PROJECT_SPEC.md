@@ -9,7 +9,7 @@ A real-time multiplayer rock-paper-scissors web game where players are automatic
 - **Runtime**: Bun
 - **Backend**: Bun.serve() with native WebSockets
 - **Frontend**: React 18 with TypeScript
-- **Styling**: Tailwind CSS + DaisyUI
+- **Styling**: Tailwind CSS
 - **Database**: Memory
 - **Container**: Docker
 
@@ -71,7 +71,7 @@ If a player disconnects or leaves during a match, the remaining player is shown 
 
 ## Currently Implemented Features
 
-- Pick technologies (Bun, React 18, TypeScript, Tailwind, DaisyUI)
+- Pick technologies (Bun, React 18, TypeScript, Tailwind)
 - Project scaffolding (server + client structure, build and dev scripts)
 - Server and client communication via WebSockets (Bun native WebSocket API)
 - Unit and E2E tests (Bun unit tests in `src/__tests__`; Playwright E2E in `e2e/`)

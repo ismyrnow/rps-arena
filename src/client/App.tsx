@@ -105,20 +105,29 @@ export default function App() {
     PLAYING_STATUSES.includes(status as GameStatus) && gameState;
 
   return (
-    <>
-      {status === "connecting" && <Connecting />}
-      {status === "lobby" && <Lobby playerId={playerId} />}
-      {status === "matched" && <Matched />}
-      {isPlaying && (
-        <Playing
-          playerId={playerId}
-          game={gameState}
-          onMove={handleMove}
-          onRematch={handleRematch}
-          onLeave={handleLeave}
-        />
-      )}
-      {status === "abandoned" && <Abandoned />}
-    </>
+    <div className="h-screen flex flex-col p-4 sm:p-6 lg:p-8 bg-[#f9efda]">
+      <img
+        src="/images/logo.png"
+        alt="RPS Arena"
+        className="mx-auto mb-8 w-2/6"
+      />
+      <div className="flex flex-grow items-center justify-center">
+        <div className="w-full max-w-lg">
+          {status === "connecting" && <Connecting />}
+          {status === "lobby" && <Lobby playerId={playerId} />}
+          {status === "matched" && <Matched />}
+          {isPlaying && (
+            <Playing
+              playerId={playerId}
+              game={gameState}
+              onMove={handleMove}
+              onRematch={handleRematch}
+              onLeave={handleLeave}
+            />
+          )}
+          {status === "abandoned" && <Abandoned />}
+        </div>
+      </div>
+    </div>
   );
 }

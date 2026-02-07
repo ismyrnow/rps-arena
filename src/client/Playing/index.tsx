@@ -20,26 +20,20 @@ export default function Playing({
   onLeave,
 }: Props) {
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 sm:p-6 lg:p-8">
-      <div className="w-full max-w-lg">
-        <div className="flex flex-col items-center justify-center gap-4 sm:gap-6">
-          {game.status === "playing" && (
-            <MoveSelection game={game} playerId={playerId} onMove={onMove} />
-          )}
-          {game.status === "countdown" && <Countdown />}
-          {game.status === "reveal" && (
-            <Reveal game={game} playerId={playerId} />
-          )}
-          {game.status === "finished" && (
-            <Finished
-              game={game}
-              playerId={playerId}
-              onRematch={onRematch}
-              onLeave={onLeave}
-            />
-          )}
-        </div>
-      </div>
+    <div className="flex flex-col items-center justify-center gap-4 sm:gap-6">
+      {game.status === "playing" && (
+        <MoveSelection game={game} playerId={playerId} onMove={onMove} />
+      )}
+      {game.status === "countdown" && <Countdown />}
+      {game.status === "reveal" && <Reveal game={game} playerId={playerId} />}
+      {game.status === "finished" && (
+        <Finished
+          game={game}
+          playerId={playerId}
+          onRematch={onRematch}
+          onLeave={onLeave}
+        />
+      )}
     </div>
   );
 }

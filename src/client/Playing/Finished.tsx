@@ -1,4 +1,8 @@
 import type { GameRecord } from "../../server/game";
+import Button from "../shared/Button";
+import Heading from "../shared/Heading";
+import LoadingDots from "../shared/LoadingDots";
+import Subheading from "../shared/Subheading";
 import Reveal from "./Reveal";
 
 interface Props {
@@ -23,25 +27,18 @@ export default function Finished({
       <div className="flex mt-4">
         {myRematch ? (
           <div className="flex flex-col items-center gap-4">
-            <p className="text-lg text-base-content/70">
-              Waiting for opponent...
-            </p>
-
-            <span className="loading loading-dots loading-lg"></span>
+            <Subheading>Waiting for opponent...</Subheading>
+            <LoadingDots />
           </div>
         ) : (
-          <div className="flex flex-col items-center gap-4">
-            <button
-              data-testid="rematch-btn"
-              onClick={onRematch}
-              className="btn btn-lg"
-            >
+          <div className="flex flex-col items-center gap-3">
+            <Button data-testid="rematch-btn" onClick={onRematch}>
               Rematch
-            </button>
+            </Button>
             <div>
               or{" "}
               <a
-                className="link"
+                className="underline cursor-pointer"
                 data-testid="leave-btn"
                 href="#"
                 onClick={onLeave}

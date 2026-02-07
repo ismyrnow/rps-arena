@@ -17,7 +17,7 @@ RPS Arena is a real-time multiplayer Rock-Paper-Scissors game meant to be played
 ## Architectural snapshot
 
 - Backend: Bun native HTTP server + WebSockets, TypeScript
-- Frontend: React 18 + TypeScript, Tailwind CSS + DaisyUI
+- Frontend: React 18 + TypeScript, Tailwind CSS
 - Database: In-memory (no persistence)
 - Containerization: Docker
 
@@ -28,6 +28,6 @@ RPS Arena is a real-time multiplayer Rock-Paper-Scissors game meant to be played
 - Keep react components focused on UI and delegate game logic to separate modules where appropriate.
 - Server owns game state - clients are mostly dumb terminals that send user actions and render server state.
 - Write unit tests for all non-trivial logic.
-- Use Tailwind CSS for styling, with DaisyUI components where appropriate.
+- Use Tailwind CSS for styling.
 - Perform a check following major changes: `bun run check` (format + typecheck + unit tests)
 - Code should be idiomatic and consistent with the existing codebase style. Follow patterns already established in the project.
