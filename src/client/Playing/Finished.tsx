@@ -1,9 +1,8 @@
 import type { GameRecord } from "../../server/game";
 import Button from "../shared/Button";
-import Heading from "../shared/Heading";
 import LoadingDots from "../shared/LoadingDots";
 import Subheading from "../shared/Subheading";
-import Reveal from "./Reveal";
+import Results from "./Results";
 
 interface Props {
   game: GameRecord;
@@ -22,8 +21,8 @@ export default function Finished({
     playerId === game.player1 ? game.player1Rematch : game.player2Rematch;
 
   return (
-    <div className="flex flex-col items-center gap-4">
-      <Reveal game={game} playerId={playerId} />
+    <div className="flex flex-col items-center gap-12">
+      <Results game={game} playerId={playerId} />
       <div className="flex mt-4">
         {myRematch ? (
           <div className="flex flex-col items-center gap-4">
@@ -31,8 +30,8 @@ export default function Finished({
             <LoadingDots />
           </div>
         ) : (
-          <div className="flex flex-col items-center gap-3">
-            <Button data-testid="rematch-btn" onClick={onRematch}>
+          <div className="flex flex-col items-center gap-4">
+            <Button data-testid="rematch-btn" onClick={onRematch} size="lg">
               Rematch
             </Button>
             <div>

@@ -6,7 +6,7 @@ interface Props {}
 
 export default function Abandoned(props: Props) {
   return (
-    <div className="flex flex-col items-center justify-center gap-4 sm:gap-6">
+    <div className="flex flex-col w-full items-center justify-center gap-4 sm:gap-6">
       <svg
         xmlns="http://www.w3.org/2000/svg"
         className="h-16 w-16 sm:h-20 sm:w-20 text-orange-400"

@@ -13,7 +13,6 @@ export type GameStatus =
   | "matched"
   | "playing"
   | "countdown"
-  | "reveal"
   | "finished"
   | "abandoned";
 
@@ -30,6 +29,7 @@ export type GameRecord = {
   player1Score: number;
   player2Score: number;
   abandonedBy: string | null;
+  round: number;
 };
 
 export type GameEvent =
@@ -250,6 +250,7 @@ export class GameManager extends EventEmitter {
       player2Score: 0,
       player2Rematch: false,
       abandonedBy: null,
+      round: 1,
     };
 
     this.games.set(gameId, game);
@@ -279,12 +280,12 @@ export class GameManager extends EventEmitter {
 
     const timer = setTimeout(() => {
       this.timers.delete(`${gameId}:countdown`);
-      this.revealMoves(gameId);
+      this.finishGame(gameId);
     }, this.countdownInterval * 3);
     this.timers.set(`${gameId}:countdown`, timer);
   }
 
-  private revealMoves(gameId: GameRecord["id"]): void {
+  private finishGame(gameId: GameRecord["id"]): void {
     const game = this.games.get(gameId);
     if (!game || !game.player1Move || !game.player2Move) return;
 
@@ -296,28 +297,17 @@ export class GameManager extends EventEmitter {
       winner = result === "player1" ? game.player1 : game.player2;
     }
 
-    const revealed: GameRecord = {
+    const finished: GameRecord = {
       ...game,
-      status: "reveal",
+      status: "finished",
       winner,
       player1Score:
         winner === game.player1 ? game.player1Score + 1 : game.player1Score,
       player2Score:
         winner === game.player2 ? game.player2Score + 1 : game.player2Score,
     };
-    this.games.set(gameId, revealed);
-    this.emitAll([{ type: "game:updated", game: revealed }]);
-
-    // Transition to finished after a brief reveal period
-    const timer = setTimeout(() => {
-      this.timers.delete(`${gameId}:reveal`);
-      const current = this.games.get(gameId);
-      if (!current || current.status !== "reveal") return;
-      const finished: GameRecord = { ...current, status: "finished" };
-      this.games.set(gameId, finished);
-      this.emitAll([{ type: "game:updated", game: finished }]);
-    }, this.countdownInterval * 2);
-    this.timers.set(`${gameId}:reveal`, timer);
+    this.games.set(gameId, finished);
+    this.emitAll([{ type: "game:updated", game: finished }]);
   }
 
   private resetForRematch(gameId: GameRecord["id"]): void {
@@ -332,6 +322,7 @@ export class GameManager extends EventEmitter {
       winner: null,
       player1Rematch: false,
       player2Rematch: false,
+      round: game.round + 1,
     };
     this.games.set(gameId, reset);
     this.emitAll([{ type: "game:updated", game: reset }]);

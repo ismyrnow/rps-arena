@@ -139,7 +139,7 @@ describe("ConnectionManager", () => {
       ws2,
       createMessage("move:select", { gameId: game.id, move: "scissors" }),
     );
-    await flush(); // countdown → reveal → finished
+    await flush(); // countdown → finished
 
     expect(gm.getGame(game.id)?.status).toBe("finished");
 

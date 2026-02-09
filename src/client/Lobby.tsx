@@ -8,7 +8,7 @@ interface Props {
 
 export default function Lobby(props: Props) {
   return (
-    <div className="flex flex-col items-center justify-center min-h-[50vh] gap-6">
+    <div className="flex flex-col w-full items-center justify-center min-h-[50vh] gap-6">
       <section>
         <Heading>Waiting for opponent...</Heading>
         <Subheading>Looking for someone to battle with</Subheading>

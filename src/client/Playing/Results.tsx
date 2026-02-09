@@ -1,12 +1,25 @@
-import type { GameRecord } from "../../server/game";
-import { MOVE_EMOJI } from "./constants";
+import type { GameRecord, Move } from "../../server/game";
+import { MOVE_IMAGES } from "./constants";
 
 interface Props {
   game: GameRecord;
   playerId: string;
 }
 
-export default function Reveal({ game, playerId }: Props) {
+const MoveDisplay: React.FC<{
+  move: Move | null;
+  label: string;
+  testId: string;
+}> = ({ move, label, testId }) => (
+  <div className="flex flex-col items-center gap-2">
+    <span data-testid={testId} className="text-6xl">
+      {move ? <img src={MOVE_IMAGES[move]} alt={move} className="h-18" /> : "?"}
+    </span>
+    <span className="text-sm text-base-content/70">{label}</span>
+  </div>
+);
+
+export default function Results({ game, playerId }: Props) {
   const myMove =
     playerId === game.player1 ? game.player1Move : game.player2Move;
   const opponentMove =
@@ -40,21 +53,21 @@ export default function Reveal({ game, playerId }: Props) {
         {resultText}
       </h2>
       <div className="flex gap-8 text-6xl">
-        <div className="flex flex-col items-center gap-2">
-          <span data-testid="my-move">{myMove ? MOVE_EMOJI[myMove] : "?"}</span>
-          <span className="text-sm text-base-content/70">You</span>
+        <div className="w-1/3">
+          <MoveDisplay move={myMove} label="You" testId="my-move" />
         </div>
         <div
-          className="text-2xl self-center text-base-content/50"
+          className="text-2xl self-center w-1/3 text-center"
           data-testid="score"
         >
           {yourScore} - {opponentScore}
         </div>
-        <div className="flex flex-col items-center gap-2">
-          <span data-testid="opponent-move">
-            {opponentMove ? MOVE_EMOJI[opponentMove] : "?"}
-          </span>
-          <span className="text-sm text-base-content/70">Opponent</span>
+        <div className="w-1/3">
+          <MoveDisplay
+            move={opponentMove}
+            label="Opponent"
+            testId="opponent-move"
+          />
         </div>
       </div>
     </div>

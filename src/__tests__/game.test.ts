@@ -169,7 +169,7 @@ describe("Gameplay", () => {
     expect(updated?.player1Move).toBe("rock");
   });
 
-  test("both moves triggers countdown, reveal, and finished", async () => {
+  test("both moves triggers countdown and finished", async () => {
     const manager = createTestManager();
     const listener = mock();
     manager.on("game:updated", listener);

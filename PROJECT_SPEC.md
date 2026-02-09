@@ -76,7 +76,7 @@ If a player disconnects or leaves during a match, the remaining player is shown 
 - Server and client communication via WebSockets (Bun native WebSocket API)
 - Unit and E2E tests (Bun unit tests in `src/__tests__`; Playwright E2E in `e2e/`)
 - Lobby and matchmaking (automatic pairing from lobby into game rooms)
-- Game UI and flow (move selection, countdown, reveal, results, rematch, leave)
+- Game UI and flow (move selection, countdown, results, rematch, leave)
 - Handling opponent disconnect or leave (mark game abandoned and notify remaining player)
 
 ## Features to Implement
@@ -92,7 +92,7 @@ Architecture overview:
 - Runtime: Bun (server + package manager)
 - Server: `src/index.ts` (Bun.serve) — handles HTTP + WebSocket upgrade, logs connections, and publishes updates to channels.
 - Connection management: `src/server/connection.ts` — `ConnectionManager` class tracks WebSocket connections (private map, exposed via `getConnection`), delegates player registration and message handling to the `GameManager`.
-- Game logic: `src/server/game.ts` — `GameManager` class manages `players` and `games`, handles matchmaking, gameplay (moves, countdown, reveal, results), rematch, leave, and disconnect. Emits events via `EventEmitter` (`room:joined`, `room:left`, `game:created`, `game:updated`, `game:deleted`).
+- Game logic: `src/server/game.ts` — `GameManager` class manages `players` and `games`, handles matchmaking, gameplay (moves, countdown, results), rematch, leave, and disconnect. Emits events via `EventEmitter` (`room:joined`, `room:left`, `game:created`, `game:updated`, `game:deleted`).
 - Client: `src/client/*` — React components, `App.tsx` renders UI and subscribes to server channels via a small WebSocket service.
 - Tests: - Unit tests: `src/__tests__/*` (Bun test runner) for pure logic (game manager, utils).
   - E2E tests: `e2e/*` (Playwright) to exercise full browser flow (matchmaking, gameplay, disconnect).
@@ -107,7 +107,7 @@ File structure (top-level)
 - `src/server/game.ts` — game manager (matchmaking + gameplay logic)
 - `src/client/index.tsx` — client entry
 - `src/client/App.tsx` — main React app and UI
-- `src/client/Playing.tsx` — gameplay UI (move selection, countdown, reveal, results, rematch)
+- `src/client/Playing.tsx` — gameplay UI (move selection, countdown, results, rematch)
 - `src/client/utils.ts` — helpers (message parsing, player id generation)
 - `src/__tests__/` — unit tests (Bun)
 - `public/index.html` — client HTML shell
@@ -129,7 +129,7 @@ Match data structures:
 
 - `Move`: `'rock' | 'paper' | 'scissors'`.
 - `PlayerRecord`: `{ id: string; room: RoomId }` where `RoomId` is `lobby` or `game-...`.
- - `GameRecord`: `{ id: string; player1: string; player2: string; status: 'matched'|'playing'|'countdown'|'reveal'|'finished'|'abandoned'; player1Move: Move | null; player2Move: Move | null; winner: string | 'draw' | null; player1Rematch: boolean; player2Rematch: boolean; abandonedBy: string | null; player1Score: number; player2Score: number }`.
+- `GameRecord`: `{ id: string; player1: string; player2: string; status: 'matched'|'playing'|'countdown'|'finished'|'abandoned'; player1Move: Move | null; player2Move: Move | null; winner: string | 'draw' | null; player1Rematch: boolean; player2Rematch: boolean; abandonedBy: string | null; player1Score: number; player2Score: number }`.
 
 Notes:
 

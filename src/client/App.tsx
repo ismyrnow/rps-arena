@@ -19,16 +19,10 @@ type AppStatus =
   | "matched"
   | "playing"
   | "countdown"
-  | "reveal"
   | "finished"
   | "abandoned";
 
-const PLAYING_STATUSES: GameStatus[] = [
-  "playing",
-  "countdown",
-  "reveal",
-  "finished",
-];
+const PLAYING_STATUSES: GameStatus[] = ["playing", "countdown", "finished"];
 
 export default function App() {
   const [playerId, setPlayerId] = useState<string>("");
@@ -109,24 +103,22 @@ export default function App() {
       <img
         src="/images/logo.png"
         alt="RPS Arena"
-        className="mx-auto mb-8 w-2/6"
+        className="mx-auto mt-2 mb-4 w-2/6"
       />
-      <div className="flex flex-grow items-center justify-center">
-        <div className="w-full max-w-lg">
-          {status === "connecting" && <Connecting />}
-          {status === "lobby" && <Lobby playerId={playerId} />}
-          {status === "matched" && <Matched />}
-          {isPlaying && (
-            <Playing
-              playerId={playerId}
-              game={gameState}
-              onMove={handleMove}
-              onRematch={handleRematch}
-              onLeave={handleLeave}
-            />
-          )}
-          {status === "abandoned" && <Abandoned />}
-        </div>
+      <div className="flex flex-grow">
+        {status === "connecting" && <Connecting />}
+        {status === "lobby" && <Lobby playerId={playerId} />}
+        {status === "matched" && <Matched />}
+        {isPlaying && (
+          <Playing
+            playerId={playerId}
+            game={gameState}
+            onMove={handleMove}
+            onRematch={handleRematch}
+            onLeave={handleLeave}
+          />
+        )}
+        {status === "abandoned" && <Abandoned />}
       </div>
     </div>
   );
