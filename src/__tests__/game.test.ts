@@ -1,5 +1,5 @@
 import { describe, test, expect, mock } from "bun:test";
-import { GameManager, determineWinner, type GameEvent } from "../server/game";
+import { GameManager, determineWinner } from "../server/game";
 
 function createTestManager() {
   return new GameManager({
@@ -169,7 +169,7 @@ describe("Gameplay", () => {
     expect(updated?.player1Move).toBe("rock");
   });
 
-  test("both moves triggers countdown and finished", async () => {
+  test("both moves triggers countdown and results", async () => {
     const manager = createTestManager();
     const listener = mock();
     manager.on("game:updated", listener);
@@ -185,7 +185,7 @@ describe("Gameplay", () => {
     await flush();
 
     const final = manager.getGame(game.id);
-    expect(final?.status).toBe("finished");
+    expect(final?.status).toBe("results");
     expect(final?.winner).toBe("player-1");
     expect(final?.player1Move).toBe("rock");
     expect(final?.player2Move).toBe("scissors");
@@ -207,7 +207,7 @@ describe("Gameplay", () => {
     await flush();
 
     const final = manager.getGame(game.id);
-    expect(final?.status).toBe("finished");
+    expect(final?.status).toBe("results");
     expect(final?.winner).toBe("draw");
   });
 
@@ -223,11 +223,11 @@ describe("Gameplay", () => {
     manager.submitMove(game.id, "player-2", "scissors");
     await flush();
 
-    expect(manager.getGame(game.id)?.status).toBe("finished");
+    expect(manager.getGame(game.id)?.status).toBe("results");
 
     manager.requestRematch(game.id, "player-1");
     expect(manager.getGame(game.id)?.player1Rematch).toBe(true);
-    expect(manager.getGame(game.id)?.status).toBe("finished");
+    expect(manager.getGame(game.id)?.status).toBe("results");
 
     manager.requestRematch(game.id, "player-2");
 

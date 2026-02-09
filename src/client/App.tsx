@@ -19,10 +19,10 @@ type AppStatus =
   | "matched"
   | "playing"
   | "countdown"
-  | "finished"
+  | "results"
   | "abandoned";
 
-const PLAYING_STATUSES: GameStatus[] = ["playing", "countdown", "finished"];
+const PLAYING_STATUSES: GameStatus[] = ["playing", "countdown", "results"];
 
 export default function App() {
   const [playerId, setPlayerId] = useState<string>("");
@@ -99,7 +99,7 @@ export default function App() {
     PLAYING_STATUSES.includes(status as GameStatus) && gameState;
 
   return (
-    <div className="h-screen flex flex-col p-4 sm:p-6 lg:p-8 bg-[#f9efda]">
+    <div className="h-dvh flex flex-col p-4 sm:p-6 lg:p-8 bg-[#f9efda] overflow-hidden">
       <img
         src="/images/logo.png"
         alt="RPS Arena"

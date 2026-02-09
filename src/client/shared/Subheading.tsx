@@ -3,9 +3,5 @@ interface Props {
 }
 
 export default function Subheading(props: Props) {
-  return (
-    <p className="text-base-content/70 text-lg sm:text-xl mb-8 text-center">
-      {props.children}
-    </p>
-  );
+  return <p className="text-lg text-center">{props.children}</p>;
 }

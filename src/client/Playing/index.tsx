@@ -1,7 +1,7 @@
 import type { Move, GameRecord } from "../../server/game";
 import MoveSelection from "./MoveSelection";
 import Countdown from "./Countdown";
-import Finished from "./Finished";
+import Results from "./Results";
 import GameStats from "./GameStats";
 
 interface Props {
@@ -19,6 +19,13 @@ export default function Playing({
   onRematch,
   onLeave,
 }: Props) {
+  const playerImage =
+    playerId === game.player1 ? "images/boy.png" : "images/girl.png";
+  const opponentImage =
+    playerId === game.player1
+      ? "images/girl-opponent.png"
+      : "images/boy-opponent.png";
+
   return (
     <div className="flex flex-col items-center gap-4 sm:gap-6 relative flex-grow">
       <GameStats game={game} playerId={playerId} />
@@ -27,8 +34,8 @@ export default function Playing({
           <MoveSelection game={game} playerId={playerId} onMove={onMove} />
         )}
         {game.status === "countdown" && <Countdown />}
-        {game.status === "finished" && (
-          <Finished
+        {game.status === "results" && (
+          <Results
             game={game}
             playerId={playerId}
             onRematch={onRematch}
@@ -36,6 +43,16 @@ export default function Playing({
           />
         )}
       </div>
+      <img
+        src={playerImage}
+        alt="You"
+        className="absolute left-0 -bottom-24 h-56"
+      />
+      <img
+        src={opponentImage}
+        alt="Opponent"
+        className="absolute right-0 top-0 h-32"
+      />
     </div>
   );
 }

@@ -1,9 +1,14 @@
 import type { GameRecord, Move } from "../../server/game";
+import Button from "../shared/Button";
+import LoadingDots from "../shared/LoadingDots";
+import Subheading from "../shared/Subheading";
 import { MOVE_IMAGES } from "./constants";
 
 interface Props {
   game: GameRecord;
   playerId: string;
+  onRematch: () => void;
+  onLeave: () => void;
 }
 
 const MoveDisplay: React.FC<{
@@ -19,7 +24,7 @@ const MoveDisplay: React.FC<{
   </div>
 );
 
-export default function Results({ game, playerId }: Props) {
+export default function Results({ game, playerId, onRematch, onLeave }: Props) {
   const myMove =
     playerId === game.player1 ? game.player1Move : game.player2Move;
   const opponentMove =
@@ -43,32 +48,61 @@ export default function Results({ game, playerId }: Props) {
     playerId === game.player1 ? game.player1Score : game.player2Score;
   const opponentScore =
     playerId === game.player1 ? game.player2Score : game.player1Score;
+  const myRematch =
+    playerId === game.player1 ? game.player1Rematch : game.player2Rematch;
 
   return (
     <div className="flex flex-col items-center gap-8">
-      <h2
-        data-testid="result-text"
-        className={`text-3xl sm:text-4xl font-bold text-center ${resultClass}`}
-      >
-        {resultText}
-      </h2>
-      <div className="flex gap-8 text-6xl">
-        <div className="w-1/3">
-          <MoveDisplay move={myMove} label="You" testId="my-move" />
-        </div>
-        <div
-          className="text-2xl self-center w-1/3 text-center"
-          data-testid="score"
+      <div className="flex flex-col items-center gap-8">
+        <h2
+          data-testid="result-text"
+          className={`text-3xl sm:text-4xl font-bold text-center ${resultClass}`}
         >
-          {yourScore} - {opponentScore}
+          {resultText}
+        </h2>
+        <div className="flex gap-8 text-6xl">
+          <div className="w-1/3">
+            <MoveDisplay move={myMove} label="You" testId="my-move" />
+          </div>
+          <div
+            className="text-2xl self-center w-1/3 text-center"
+            data-testid="score"
+          >
+            {yourScore} - {opponentScore}
+          </div>
+          <div className="w-1/3">
+            <MoveDisplay
+              move={opponentMove}
+              label="Opponent"
+              testId="opponent-move"
+            />
+          </div>
         </div>
-        <div className="w-1/3">
-          <MoveDisplay
-            move={opponentMove}
-            label="Opponent"
-            testId="opponent-move"
-          />
-        </div>
+      </div>
+      <div className="h-40">
+        {myRematch ? (
+          <div className="flex flex-col items-center gap-4">
+            <Subheading>Waiting for opponent...</Subheading>
+            <LoadingDots />
+          </div>
+        ) : (
+          <div className="flex flex-col items-center gap-4">
+            <Button data-testid="rematch-btn" onClick={onRematch} size="lg">
+              Rematch
+            </Button>
+            <div>
+              or{" "}
+              <a
+                className="underline cursor-pointer"
+                data-testid="leave-btn"
+                href="#"
+                onClick={onLeave}
+              >
+                return to lobby
+              </a>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

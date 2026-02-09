@@ -129,7 +129,7 @@ Match data structures:
 
 - `Move`: `'rock' | 'paper' | 'scissors'`.
 - `PlayerRecord`: `{ id: string; room: RoomId }` where `RoomId` is `lobby` or `game-...`.
-- `GameRecord`: `{ id: string; player1: string; player2: string; status: 'matched'|'playing'|'countdown'|'finished'|'abandoned'; player1Move: Move | null; player2Move: Move | null; winner: string | 'draw' | null; player1Rematch: boolean; player2Rematch: boolean; abandonedBy: string | null; player1Score: number; player2Score: number }`.
+- `GameRecord`: `{ id: string; player1: string; player2: string; status: 'matched'|'playing'|'countdown'|'results'|'abandoned'; player1Move: Move | null; player2Move: Move | null; winner: string | 'draw' | null; player1Rematch: boolean; player2Rematch: boolean; abandonedBy: string | null; player1Score: number; player2Score: number }`.
 
 Notes:
 

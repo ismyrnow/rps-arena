@@ -1,4 +1,6 @@
 import type { Move, GameRecord } from "../../server/game";
+import LoadingDots from "../shared/LoadingDots";
+import Subheading from "../shared/Subheading";
 import MoveCircle from "./MoveCircle";
 
 interface Props {
@@ -13,10 +15,11 @@ export default function MoveSelection({ game, playerId, onMove }: Props) {
   const statusText = myMove ? "Waiting for opponent..." : "Choose your move";
 
   return (
-    <div className="flex flex-col items-center w-full gap-24">
+    <div className="flex flex-col items-center w-full gap-8">
       <MoveCircle myMove={myMove} onMove={onMove} />
-      <div className="bg-neutral-800 px-4 py-2 rounded-md text-neutral-50 text-sm">
-        {statusText}
+      <div className="flex flex-col items-center h-32 gap-4">
+        <Subheading>{statusText}</Subheading>
+        {myMove && <LoadingDots />}
       </div>
     </div>
   );

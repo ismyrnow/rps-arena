@@ -13,7 +13,7 @@ export type GameStatus =
   | "matched"
   | "playing"
   | "countdown"
-  | "finished"
+  | "results"
   | "abandoned";
 
 export type GameRecord = {
@@ -145,7 +145,7 @@ export class GameManager extends EventEmitter {
 
   requestRematch(gameId: GameRecord["id"], playerId: string): void {
     const game = this.games.get(gameId);
-    if (!game || game.status !== "finished") return;
+    if (!game || game.status !== "results") return;
     if (playerId !== game.player1 && playerId !== game.player2) return;
 
     const field =
@@ -297,17 +297,17 @@ export class GameManager extends EventEmitter {
       winner = result === "player1" ? game.player1 : game.player2;
     }
 
-    const finished: GameRecord = {
+    const results: GameRecord = {
       ...game,
-      status: "finished",
+      status: "results",
       winner,
       player1Score:
         winner === game.player1 ? game.player1Score + 1 : game.player1Score,
       player2Score:
         winner === game.player2 ? game.player2Score + 1 : game.player2Score,
     };
-    this.games.set(gameId, finished);
-    this.emitAll([{ type: "game:updated", game: finished }]);
+    this.games.set(gameId, results);
+    this.emitAll([{ type: "game:updated", game: results }]);
   }
 
   private resetForRematch(gameId: GameRecord["id"]): void {

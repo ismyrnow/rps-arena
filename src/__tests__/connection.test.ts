@@ -130,7 +130,7 @@ describe("ConnectionManager", () => {
 
     const game = gm.listGames()[0];
 
-    // Play to finished
+    // Play to results
     cm.message(
       ws1,
       createMessage("move:select", { gameId: game.id, move: "rock" }),
@@ -139,9 +139,9 @@ describe("ConnectionManager", () => {
       ws2,
       createMessage("move:select", { gameId: game.id, move: "scissors" }),
     );
-    await flush(); // countdown → finished
+    await flush(); // countdown → results
 
-    expect(gm.getGame(game.id)?.status).toBe("finished");
+    expect(gm.getGame(game.id)?.status).toBe("results");
 
     cm.message(ws1, createMessage("rematch:request", { gameId: game.id }));
 
