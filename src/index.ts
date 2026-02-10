@@ -1,4 +1,4 @@
-import homepage from "../public/index.html";
+import homepage from "./index.html";
 import { generatePlayerId, createMessage } from "./client/utils";
 import { GameManager, type GameRecord, type GameEvent } from "./server/game";
 import { ConnectionManager, type WebSocketData } from "./server/connection";
@@ -9,7 +9,7 @@ const connectionManager = new ConnectionManager(gameManager);
 
 const server = Bun.serve<WebSocketData>({
   port: 3000,
-  development: true,
+  development: process.env.NODE_ENV !== "production",
 
   routes: {
     "/": homepage,

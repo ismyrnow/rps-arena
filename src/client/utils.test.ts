@@ -5,7 +5,7 @@ import {
   buildWebSocketUrl,
   createMessage,
   parseMessage,
-} from "../client/utils";
+} from "./utils";
 
 // Mock storage for testing
 function createMockStorage(): Storage {
