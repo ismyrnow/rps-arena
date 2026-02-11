@@ -18,8 +18,8 @@
     "typecheck": "tsc --noEmit"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "Ishmael Smyrnow",
+  "license": "MIT",
   "dependencies": {
     "bun-plugin-tailwind": "^0.1.2",
     "clsx": "^2.1.1",
