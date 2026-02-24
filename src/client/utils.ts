@@ -3,6 +3,7 @@
  */
 
 const PLAYER_ID_KEY = "rps_playerId";
+const PLAYER_NAME_KEY = "rps_playerName";
 
 /**
  * Generates a unique player ID
@@ -32,17 +33,38 @@ export function getOrCreatePlayerId(
 }
 
 /**
+ * Gets the stored player name, or null if not set
+ */
+export function getPlayerName(
+  storage: Storage = window.localStorage,
+): string | null {
+  return storage.getItem(PLAYER_NAME_KEY);
+}
+
+/**
+ * Saves the player name to localStorage
+ */
+export function setPlayerName(
+  name: string,
+  storage: Storage = window.localStorage,
+): void {
+  storage.setItem(PLAYER_NAME_KEY, name);
+}
+
+/**
  * Builds the WebSocket URL for connecting to the game server
  * @param playerId - The player's ID
+ * @param name - The player's display name
  * @param host - The server host (defaults to current location)
  * @returns The WebSocket URL string
  */
 export function buildWebSocketUrl(
   playerId: string,
+  playerName: string,
   host: string = window.location.host,
 ): string {
   const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-  return `${protocol}//${host}/ws?playerId=${encodeURIComponent(playerId)}`;
+  return `${protocol}//${host}/ws?playerId=${encodeURIComponent(playerId)}&name=${encodeURIComponent(playerName)}`;
 }
 
 /**

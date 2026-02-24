@@ -5,6 +5,7 @@ type ButtonProps = {
   children: React.ReactNode;
   variant?: "primary" | "secondary" | "outline" | "ghost";
   size?: "sm" | "md" | "lg";
+  type?: "button" | "submit" | "reset";
   onClick?: () => void;
   disabled?: boolean;
   className?: string;
@@ -14,6 +15,7 @@ const Button: React.FC<ButtonProps> = ({
   children,
   variant = "primary",
   size = "md",
+  type = "button",
   onClick,
   disabled = false,
   className,
@@ -49,6 +51,7 @@ const Button: React.FC<ButtonProps> = ({
   return (
     <button
       className={classes}
+      type={type}
       onClick={onClick}
       disabled={disabled}
       {...otherProps}

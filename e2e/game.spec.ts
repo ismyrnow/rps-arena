@@ -1,6 +1,11 @@
-import { test, expect } from "@playwright/test";
+import { test, expect, type Page } from "@playwright/test";
 
 const SERVER_URL = "http://localhost:3000";
+
+async function enterName(page: Page, name: string) {
+  await page.fill('input[placeholder="Your name"]', name);
+  await page.click('button:has-text("Play!")');
+}
 
 test.describe("Matchmaking flow", () => {
   test("two players match and disconnect flow", async ({ browser }) => {
@@ -10,11 +15,13 @@ test.describe("Matchmaking flow", () => {
     const pageB = await contextB.newPage();
 
     await pageA.goto(SERVER_URL);
+    await enterName(pageA, "Alice");
     await expect(pageA.locator("text=Waiting for opponent")).toBeVisible();
 
     await pageB.goto(SERVER_URL);
-    await expect(pageB.locator("text=Match found")).toBeVisible();
-    await expect(pageA.locator("text=Match found")).toBeVisible();
+    await enterName(pageB, "Bob");
+    await expect(pageB.locator("text=Alice wants to battle!")).toBeVisible();
+    await expect(pageA.locator("text=Bob wants to battle!")).toBeVisible();
 
     await contextB.close();
     await expect(pageA.locator("text=Opponent left")).toBeVisible();
@@ -32,11 +39,13 @@ test.describe("Gameplay flow", () => {
 
     // Match two players
     await pageA.goto(SERVER_URL);
+    await enterName(pageA, "Alice");
     await expect(pageA.locator("text=Waiting for opponent")).toBeVisible();
 
     await pageB.goto(SERVER_URL);
-    await expect(pageB.locator("text=Match found")).toBeVisible();
-    await expect(pageA.locator("text=Match found")).toBeVisible();
+    await enterName(pageB, "Bob");
+    await expect(pageB.locator("text=Alice wants to battle!")).toBeVisible();
+    await expect(pageA.locator("text=Bob wants to battle!")).toBeVisible();
 
     // Wait for playing state (move selection)
     await expect(pageA.locator("text=Choose your move")).toBeVisible({

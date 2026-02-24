@@ -26,7 +26,13 @@ Use Bun for runtime and package management. Examples:
 
 ```
 ┌─────────────┐
-│   Lobby     │ ← Entry point
+│   Entry     │ ← Entry point (enter/confirm name)
+│  (name)     │
+└──────┬──────┘
+       │ Name submitted
+       ↓
+┌─────────────┐
+│   Lobby     │ Waiting for opponent
 │  (waiting)  │
 └──────┬──────┘
        │ Match found
@@ -62,12 +68,12 @@ Use Bun for runtime and package management. Examples:
 └─────┬───┬───┘
       │   │
       │   └─→ One leaves → Notify other (abandoned screen)
-      │                     Leaving player navigates to /
+      │                     Leaving player returns to lobby
       │
       └─→ Both rematch → Move Selection
 ```
 
-If a player disconnects or leaves during a match, the remaining player is shown an abandoned status screen: "Opponent left — return to lobby?" If they confirm, they are returned to the lobby.
+If a player disconnects or leaves during a match, the remaining player is shown an abandoned screen displaying the opponent's name. The leaving player is returned directly to the lobby.
 
 ## Currently Implemented Features
 
@@ -76,8 +82,9 @@ If a player disconnects or leaves during a match, the remaining player is shown 
 - Server and client communication via WebSockets (Bun native WebSocket API)
 - Unit and E2E tests (Bun unit tests in `src/__tests__`; Playwright E2E in `e2e/`)
 - Lobby and matchmaking (automatic pairing from lobby into game rooms)
+- Custom player names (entered on arrival; persisted in localStorage; changeable on return)
 - Game UI and flow (move selection, countdown, results, rematch, leave)
-- Handling opponent disconnect or leave (mark game abandoned and notify remaining player)
+- Handling opponent disconnect or leave (mark game abandoned, show opponent name, leaving player returns to lobby)
 
 ## Features to Implement
 
@@ -115,21 +122,21 @@ File structure (top-level)
 
 Message contract (high level):
 
+- Connection: WebSocket upgrade at `/ws?playerId=<id>&name=<name>`
+
 - Client -> Server:
-  - `lobby:join` { playerId }
   - `move:select` { gameId, move }
   - `rematch:request` { gameId }
   - `game:leave` { gameId }
 
 - Server -> Client (published on channels):
-  - `player:joined` / `player:left` (lobby channel)
   - `game:updated` (game channel, includes full `GameRecord`)
 
 Match data structures:
 
 - `Move`: `'rock' | 'paper' | 'scissors'`.
-- `PlayerRecord`: `{ id: string; room: RoomId }` where `RoomId` is `lobby` or `game-...`.
-- `GameRecord`: `{ id: string; player1: string; player2: string; status: 'matched'|'playing'|'countdown'|'results'|'abandoned'; player1Move: Move | null; player2Move: Move | null; winner: string | 'draw' | null; player1Rematch: boolean; player2Rematch: boolean; abandonedBy: string | null; player1Score: number; player2Score: number }`.
+- `PlayerRecord`: `{ id: string; name: string; room: RoomId }` where `RoomId` is `lobby` or `game-...`.
+- `GameRecord`: `{ id: string; player1: string; player1Name: string; player2: string; player2Name: string; status: 'matched'|'playing'|'countdown'|'results'|'abandoned'; player1Move: Move | null; player2Move: Move | null; winner: string | 'draw' | null; player1Rematch: boolean; player2Rematch: boolean; abandonedBy: string | null; player1Score: number; player2Score: number }`.
 
 Notes:
 
@@ -143,4 +150,4 @@ Notes:
 
 ---
 
-**Last Updated**: February 6, 2026
+**Last Updated**: February 24, 2026

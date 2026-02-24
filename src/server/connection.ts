@@ -4,6 +4,7 @@ import { GameManager, type GameRecord } from "./game";
 
 export type WebSocketData = {
   playerId: string;
+  playerName: string;
 };
 
 export class ConnectionManager {
@@ -17,7 +18,7 @@ export class ConnectionManager {
 
   open(ws: ServerWebSocket<WebSocketData>): void {
     this.connections.set(ws.data.playerId, ws);
-    this.gameManager.addPlayer(ws.data.playerId);
+    this.gameManager.addPlayer(ws.data.playerId, ws.data.playerName);
   }
 
   message(ws: ServerWebSocket<WebSocketData>, message: string | Buffer): void {

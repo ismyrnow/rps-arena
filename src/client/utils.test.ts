@@ -2,6 +2,8 @@ import { describe, test, expect, beforeEach } from "bun:test";
 import {
   generatePlayerId,
   getOrCreatePlayerId,
+  getPlayerName,
+  setPlayerName,
   buildWebSocketUrl,
   createMessage,
   parseMessage,
@@ -85,6 +87,29 @@ describe("getOrCreatePlayerId", () => {
   });
 });
 
+describe("getPlayerName / setPlayerName", () => {
+  let storage: Storage;
+
+  beforeEach(() => {
+    storage = createMockStorage();
+  });
+
+  test("returns null when no name is stored", () => {
+    expect(getPlayerName(storage)).toBeNull();
+  });
+
+  test("returns stored name after setPlayerName", () => {
+    setPlayerName("Alice", storage);
+    expect(getPlayerName(storage)).toBe("Alice");
+  });
+
+  test("overwrites existing name", () => {
+    setPlayerName("Alice", storage);
+    setPlayerName("Bob", storage);
+    expect(getPlayerName(storage)).toBe("Bob");
+  });
+});
+
 describe("buildWebSocketUrl", () => {
   // Save original window object properties
   const originalLocation = globalThis.window?.location;
@@ -100,29 +125,39 @@ describe("buildWebSocketUrl", () => {
   });
 
   test("builds URL with player id", () => {
-    const url = buildWebSocketUrl("test-player", "localhost:3000");
+    const url = buildWebSocketUrl("test-player", "Alice", "localhost:3000");
     expect(url).toContain("playerId=test-player");
   });
 
   test("uses ws protocol for http", () => {
-    const url = buildWebSocketUrl("test-player", "localhost:3000");
+    const url = buildWebSocketUrl("test-player", "Alice", "localhost:3000");
     expect(url.startsWith("ws://")).toBe(true);
   });
 
   test("uses wss protocol for https", () => {
     (globalThis as any).window.location.protocol = "https:";
-    const url = buildWebSocketUrl("test-player", "example.com");
+    const url = buildWebSocketUrl("test-player", "Alice", "example.com");
     expect(url.startsWith("wss://")).toBe(true);
   });
 
   test("encodes special characters in player id", () => {
-    const url = buildWebSocketUrl("player with spaces", "localhost:3000");
+    const url = buildWebSocketUrl("player with spaces", "Alice", "localhost:3000");
     expect(url).toContain("playerId=player%20with%20spaces");
   });
 
   test("uses provided host", () => {
-    const url = buildWebSocketUrl("test-player", "example.com:8080");
+    const url = buildWebSocketUrl("test-player", "Alice", "example.com:8080");
     expect(url).toContain("example.com:8080");
+  });
+
+  test("includes player name in URL", () => {
+    const url = buildWebSocketUrl("test-player", "Alice", "localhost:3000");
+    expect(url).toContain("name=Alice");
+  });
+
+  test("encodes special characters in player name", () => {
+    const url = buildWebSocketUrl("test-player", "Alice Smith", "localhost:3000");
+    expect(url).toContain("name=Alice%20Smith");
   });
 });
 

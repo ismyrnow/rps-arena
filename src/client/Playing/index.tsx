@@ -43,16 +43,18 @@ export default function Playing({
           />
         )}
       </div>
-      <img
-        src={playerImage}
-        alt="You"
-        className="absolute left-0 -bottom-24 h-56"
-      />
-      <img
-        src={opponentImage}
-        alt="Opponent"
-        className="absolute right-0 top-0 h-32"
-      />
+      <div className="absolute left-0 -bottom-24 flex flex-col items-center gap-1">
+        <span className="text-xs text-neutral-500 -mt-1">
+          {playerId === game.player1 ? game.player1Name : game.player2Name}
+        </span>
+        <img src={playerImage} alt="You" className="h-56" />
+      </div>
+      <div className="absolute right-0 top-0 flex flex-col items-center gap-1">
+        <img src={opponentImage} alt="Opponent" className="h-32" />
+        <span className="text-xs text-neutral-500">
+          {playerId === game.player1 ? game.player2Name : game.player1Name}
+        </span>
+      </div>
     </div>
   );
 }

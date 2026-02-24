@@ -2,11 +2,7 @@ import Heading from "./shared/Heading";
 import LoadingDots from "./shared/LoadingDots";
 import Subheading from "./shared/Subheading";
 
-interface Props {
-  playerId: string;
-}
-
-export default function Lobby(props: Props) {
+export default function Lobby() {
   return (
     <div className="flex flex-col w-full items-center justify-center gap-8">
       <section>
@@ -15,9 +11,6 @@ export default function Lobby(props: Props) {
       </section>
       <section>
         <LoadingDots />
-      </section>
-      <section>
-        <p className="text-sm text-neutral-500">Player ID: {props.playerId}</p>
       </section>
     </div>
   );

@@ -1,10 +1,17 @@
+import type { GameRecord } from "../server/game";
 import Heading from "./shared/Heading";
 import LoadingDots from "./shared/LoadingDots";
 import Subheading from "./shared/Subheading";
 
-interface Props {}
+interface Props {
+  game: GameRecord;
+  playerId: string;
+}
 
-export default function Matched(props: Props) {
+export default function Matched({ game, playerId }: Props) {
+  const opponentName =
+    playerId === game.player1 ? game.player2Name : game.player1Name;
+
   return (
     <div className="flex flex-col w-full items-center justify-center gap-8">
       <svg
@@ -20,7 +27,7 @@ export default function Matched(props: Props) {
         />
       </svg>
       <section>
-        <Heading>Match found!</Heading>
+        <Heading>{opponentName} wants to battle!</Heading>
         <Subheading>Get ready to battle!</Subheading>
       </section>
       <LoadingDots />

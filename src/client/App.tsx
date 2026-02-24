@@ -1,11 +1,14 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 import {
   getOrCreatePlayerId,
+  getPlayerName,
+  setPlayerName,
   buildWebSocketUrl,
   createMessage,
   parseMessage,
 } from "./utils";
 import { wsService } from "./WebSocketService";
+import Entry from "./Entry";
 import Connecting from "./Connecting";
 import Lobby from "./Lobby";
 import Matched from "./Matched";
@@ -14,6 +17,7 @@ import Playing from "./Playing";
 import type { GameRecord, GameStatus, Move } from "../server/game";
 
 type AppStatus =
+  | "entry"
   | "connecting"
   | "lobby"
   | "matched"
@@ -26,15 +30,15 @@ const PLAYING_STATUSES: GameStatus[] = ["playing", "countdown", "results"];
 
 export default function App() {
   const [playerId, setPlayerId] = useState<string>("");
-  const [status, setStatus] = useState<AppStatus>("connecting");
+  const [status, setStatus] = useState<AppStatus>("entry");
   const [gameState, setGameState] = useState<GameRecord | null>(null);
   const wsServiceRef = useRef(wsService);
 
-  useEffect(() => {
+  const connect = useCallback((playerName: string) => {
     const storedPlayerId = getOrCreatePlayerId();
     setPlayerId(storedPlayerId);
 
-    const url = buildWebSocketUrl(storedPlayerId);
+    const url = buildWebSocketUrl(storedPlayerId, playerName);
     wsServiceRef.current.connect(
       storedPlayerId,
       url,
@@ -55,20 +59,26 @@ export default function App() {
             game.player2 === storedPlayerId
           ) {
             setGameState(game);
-            if (game.status === "abandoned") {
-              setStatus("abandoned");
-            } else {
-              setStatus(game.status);
-            }
+            setStatus(game.status);
           }
         }
       },
     );
+  }, []);
 
+  useEffect(() => {
     return () => {
       wsServiceRef.current.close();
     };
   }, []);
+
+  const handleEnterName = useCallback(
+    (playerName: string) => {
+      setPlayerName(playerName);
+      connect(playerName);
+    },
+    [connect],
+  );
 
   const handleMove = useCallback(
     (move: Move) => {
@@ -92,7 +102,8 @@ export default function App() {
     wsServiceRef.current.send(
       createMessage("game:leave", { gameId: gameState.id }),
     );
-    window.location.href = "/";
+    setStatus("lobby");
+    setGameState(null);
   }, [gameState]);
 
   const isPlaying =
@@ -105,10 +116,18 @@ export default function App() {
         alt="RPS Arena"
         className="mx-auto mt-2 mb-4 w-2/6"
       />
-      <div className="flex flex-grow">
+      <div className="flex grow">
+        {status === "entry" && (
+          <Entry
+            onEnter={handleEnterName}
+            existingName={getPlayerName() ?? undefined}
+          />
+        )}
         {status === "connecting" && <Connecting />}
-        {status === "lobby" && <Lobby playerId={playerId} />}
-        {status === "matched" && <Matched />}
+        {status === "lobby" && <Lobby />}
+        {status === "matched" && gameState && (
+          <Matched game={gameState} playerId={playerId} />
+        )}
         {isPlaying && (
           <Playing
             playerId={playerId}
@@ -118,7 +137,13 @@ export default function App() {
             onLeave={handleLeave}
           />
         )}
-        {status === "abandoned" && <Abandoned />}
+        {status === "abandoned" && gameState && (
+          <Abandoned
+            playerId={playerId}
+            game={gameState}
+            onLeave={handleLeave}
+          />
+        )}
       </div>
     </div>
   );

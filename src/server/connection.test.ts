@@ -17,9 +17,9 @@ function flush(): Promise<void> {
 }
 
 /** Create a minimal mock WebSocket for testing */
-function createMockWs(playerId: string) {
+function createMockWs(playerId: string, playerName: string = "Player") {
   return {
-    data: { playerId },
+    data: { playerId, playerName },
     send: mock(),
     close: mock(),
     subscribe: mock(),

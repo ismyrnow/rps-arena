@@ -1,0 +1,1 @@
+/Users/ishmael/Projects/rps-arena/AGENTS.md

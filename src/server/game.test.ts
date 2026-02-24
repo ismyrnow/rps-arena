@@ -23,17 +23,19 @@ describe("GameManager", () => {
     const gameCreatedListener = mock();
     manager.on("game:created", gameCreatedListener);
 
-    manager.addPlayer("player-1");
+    manager.addPlayer("player-1", "Player One");
     expect(gameCreatedListener).not.toHaveBeenCalled();
     expect(manager.getPlayer("player-1")?.room).toBe("lobby");
 
-    manager.addPlayer("player-2");
+    manager.addPlayer("player-2", "Player Two");
     expect(gameCreatedListener).toHaveBeenCalled();
 
     const game = manager.listGames()[0];
     expect(game.id).toBe("game-abcd");
     expect(game.player1).toBe("player-1");
+    expect(game.player1Name).toBe("Player One");
     expect(game.player2).toBe("player-2");
+    expect(game.player2Name).toBe("Player Two");
     expect(game.status).toBe("matched");
 
     expect(manager.getPlayer("player-1")?.room).toBe("game-abcd");
@@ -47,7 +49,7 @@ describe("GameManager", () => {
     const gameUpdatedListener = mock();
     manager.on("game:updated", gameUpdatedListener);
 
-    manager.addPlayer("player-1");
+    manager.addPlayer("player-1", "Player One");
 
     manager.removePlayer("player-1");
     expect(gameUpdatedListener).not.toHaveBeenCalled();
@@ -65,8 +67,8 @@ describe("GameManager", () => {
     const gameUpdatedListener = mock();
     manager.on("game:updated", gameUpdatedListener);
 
-    manager.addPlayer("player-1");
-    manager.addPlayer("player-2");
+    manager.addPlayer("player-1", "Player One");
+    manager.addPlayer("player-2", "Player Two");
 
     manager.removePlayer("player-1");
     expect(gameUpdatedListener).toHaveBeenCalled();
@@ -86,8 +88,8 @@ describe("GameManager", () => {
     const gameDeletedListener = mock();
     manager.on("game:deleted", gameDeletedListener);
 
-    manager.addPlayer("player-1");
-    manager.addPlayer("player-2");
+    manager.addPlayer("player-1", "Player One");
+    manager.addPlayer("player-2", "Player Two");
 
     manager.removePlayer("player-1");
     manager.removePlayer("player-2");
@@ -126,8 +128,8 @@ describe("Gameplay", () => {
   test("transitions from matched to playing after delay", async () => {
     const manager = createTestManager();
 
-    manager.addPlayer("player-1");
-    manager.addPlayer("player-2");
+    manager.addPlayer("player-1", "Player One");
+    manager.addPlayer("player-2", "Player Two");
 
     const game = manager.listGames()[0];
     expect(game.status).toBe("matched");
@@ -141,8 +143,8 @@ describe("Gameplay", () => {
   test("records a move without transitioning when only one player submits", async () => {
     const manager = createTestManager();
 
-    manager.addPlayer("player-1");
-    manager.addPlayer("player-2");
+    manager.addPlayer("player-1", "Player One");
+    manager.addPlayer("player-2", "Player Two");
     await flush();
 
     const game = manager.listGames()[0];
@@ -157,8 +159,8 @@ describe("Gameplay", () => {
   test("ignores duplicate move from same player", async () => {
     const manager = createTestManager();
 
-    manager.addPlayer("player-1");
-    manager.addPlayer("player-2");
+    manager.addPlayer("player-1", "Player One");
+    manager.addPlayer("player-2", "Player Two");
     await flush();
 
     const game = manager.listGames()[0];
@@ -174,8 +176,8 @@ describe("Gameplay", () => {
     const listener = mock();
     manager.on("game:updated", listener);
 
-    manager.addPlayer("player-1");
-    manager.addPlayer("player-2");
+    manager.addPlayer("player-1", "Player One");
+    manager.addPlayer("player-2", "Player Two");
     await flush();
 
     const game = manager.listGames()[0];
@@ -196,8 +198,8 @@ describe("Gameplay", () => {
   test("draw result is recorded correctly", async () => {
     const manager = createTestManager();
 
-    manager.addPlayer("player-1");
-    manager.addPlayer("player-2");
+    manager.addPlayer("player-1", "Player One");
+    manager.addPlayer("player-2", "Player Two");
     await flush();
 
     const game = manager.listGames()[0];
@@ -214,8 +216,8 @@ describe("Gameplay", () => {
   test("rematch resets game to playing when both request", async () => {
     const manager = createTestManager();
 
-    manager.addPlayer("player-1");
-    manager.addPlayer("player-2");
+    manager.addPlayer("player-1", "Player One");
+    manager.addPlayer("player-2", "Player Two");
     await flush();
 
     const game = manager.listGames()[0];
@@ -243,8 +245,8 @@ describe("Gameplay", () => {
   test("leaveGame marks game abandoned and returns leaving player to lobby", async () => {
     const manager = createTestManager();
 
-    manager.addPlayer("player-1");
-    manager.addPlayer("player-2");
+    manager.addPlayer("player-1", "Player One");
+    manager.addPlayer("player-2", "Player Two");
     await flush();
 
     const game = manager.listGames()[0];
@@ -259,8 +261,8 @@ describe("Gameplay", () => {
   test("ignores move when game is not in playing state", async () => {
     const manager = createTestManager();
 
-    manager.addPlayer("player-1");
-    manager.addPlayer("player-2");
+    manager.addPlayer("player-1", "Player One");
+    manager.addPlayer("player-2", "Player Two");
 
     // Game is still in "matched" state
     const game = manager.listGames()[0];

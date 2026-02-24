@@ -6,6 +6,7 @@ export type Move = "rock" | "paper" | "scissors";
 
 export type PlayerRecord = {
   id: string;
+  name: string;
   room: RoomId;
 };
 
@@ -20,6 +21,8 @@ export type GameRecord = {
   id: `game-${string}`;
   player1: string;
   player2: string;
+  player1Name: string;
+  player2Name: string;
   status: GameStatus;
   player1Move: Move | null;
   player2Move: Move | null;
@@ -96,13 +99,25 @@ export class GameManager extends EventEmitter {
     return Array.from(this.games.values());
   }
 
-  addPlayer(playerId: string): void {
+  addPlayer(playerId: string, playerName: string): void {
     const events: GameEvent[] = [];
-    const player: PlayerRecord = { id: playerId, room: "lobby" };
+    const player: PlayerRecord = {
+      id: playerId,
+      name: playerName,
+      room: "lobby",
+    };
     this.players.set(playerId, player);
 
     events.push({ type: "player:added", player });
     events.push({ type: "room:joined", playerId, room: "lobby" });
+
+    events.push(...this.getMatchmakingEvents());
+
+    this.emitAll(events);
+  }
+
+  getMatchmakingEvents(): GameEvent[] {
+    const events: GameEvent[] = [];
 
     const lobbyPlayers = this.listPlayers().filter(
       (entry) => entry.room === "lobby",
@@ -110,7 +125,12 @@ export class GameManager extends EventEmitter {
 
     if (lobbyPlayers.length >= 2) {
       const [player1, player2] = lobbyPlayers;
-      const game = this.createGame(player1.id, player2.id);
+      const game = this.createGame(
+        player1.id,
+        player1.name,
+        player2.id,
+        player2.name,
+      );
 
       events.push({ type: "room:left", playerId: player1.id, room: "lobby" });
       events.push({ type: "room:left", playerId: player2.id, room: "lobby" });
@@ -121,6 +141,16 @@ export class GameManager extends EventEmitter {
       events.push({ type: "room:joined", playerId: player1.id, room: game.id });
       events.push({ type: "room:joined", playerId: player2.id, room: game.id });
       events.push({ type: "game:created", game });
+    }
+
+    return events;
+  }
+
+  doMatchmaking(): void {
+    const events = this.getMatchmakingEvents();
+
+    if (events.length === 0) {
+      return;
     }
 
     this.emitAll(events);
@@ -231,7 +261,12 @@ export class GameManager extends EventEmitter {
     }
   }
 
-  private createGame(player1: string, player2: string): GameRecord {
+  private createGame(
+    player1: string,
+    player1Name: string,
+    player2: string,
+    player2Name: string,
+  ): GameRecord {
     let gameId: `game-${string}` = `game-${this.gameIdGenerator()}`;
     while (this.games.has(gameId)) {
       gameId = `game-${this.gameIdGenerator()}`;
@@ -241,6 +276,8 @@ export class GameManager extends EventEmitter {
       id: gameId,
       player1,
       player2,
+      player1Name,
+      player2Name,
       status: "matched",
       player1Move: null,
       player2Move: null,

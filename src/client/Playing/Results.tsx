@@ -39,10 +39,10 @@ export default function Results({ game, playerId, onRematch, onLeave }: Props) {
 
   const resultClass =
     game.winner === "draw"
-      ? "text-warning"
+      ? "text-inherit"
       : game.winner === playerId
-        ? "text-success"
-        : "text-error";
+        ? "text-green-600"
+        : "text-red-600";
 
   const yourScore =
     playerId === game.player1 ? game.player1Score : game.player2Score;

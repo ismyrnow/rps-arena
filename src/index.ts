@@ -17,8 +17,9 @@ const server = Bun.serve<WebSocketData>({
     "/ws": (req: BunRequest<"/ws">, server: Bun.Server<WebSocketData>) => {
       const url = new URL(req.url);
       const playerId = url.searchParams.get("playerId") || generatePlayerId();
+      const playerName = url.searchParams.get("name") || "Player";
 
-      if (server.upgrade(req, { data: { playerId } })) {
+      if (server.upgrade(req, { data: { playerId, playerName } })) {
         return; // Bun returns 101 Switching Protocols automatically
       }
       return new Response("WebSocket upgrade failed", { status: 500 });
@@ -63,10 +64,7 @@ const handleRoomJoined = (event: GameEvent) => {
   playerSocket?.subscribe(event.room);
 
   if (event.room === "lobby") {
-    server.publish(
-      "lobby",
-      createMessage("player:joined", { playerId: event.playerId }),
-    );
+    gameManager.doMatchmaking();
   }
 };
 
@@ -79,13 +77,6 @@ const handleRoomLeft = (event: GameEvent) => {
 
   const playerSocket = connectionManager.getConnection(event.playerId);
   playerSocket?.unsubscribe(event.room);
-
-  if (event.room === "lobby") {
-    server.publish(
-      "lobby",
-      createMessage("player:left", { playerId: event.playerId }),
-    );
-  }
 };
 
 const handleGameChange = (event: GameEvent) => {

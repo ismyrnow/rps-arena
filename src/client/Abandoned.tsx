@@ -1,10 +1,18 @@
+import { GameRecord } from "../server/game";
 import Button from "./shared/Button";
 import Heading from "./shared/Heading";
 import Subheading from "./shared/Subheading";
 
-interface Props {}
+interface Props {
+  playerId: string;
+  game: GameRecord;
+  onLeave: () => void;
+}
 
-export default function Abandoned(props: Props) {
+export default function Abandoned({ playerId, game, onLeave }: Props) {
+  const opponentName =
+    playerId === game.player1 ? game.player2Name : game.player1Name;
+
   return (
     <div className="flex flex-col w-full items-center justify-center gap-8">
       <svg
@@ -21,9 +29,9 @@ export default function Abandoned(props: Props) {
       </svg>
       <section>
         <Heading>Opponent left</Heading>
-        <Subheading>Your opponent is no longer in the game</Subheading>
+        <Subheading>{opponentName} ran away!</Subheading>
       </section>
-      <Button onClick={() => window.location.reload()}>Return to Lobby</Button>
+      <Button onClick={onLeave}>Return to Lobby</Button>
     </div>
   );
 }
