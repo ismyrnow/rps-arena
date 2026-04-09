@@ -29,7 +29,7 @@ export default function Playing({
   return (
     <div className="flex flex-col items-center gap-4 sm:gap-6 relative flex-grow">
       <GameStats game={game} playerId={playerId} />
-      <div className="flex flex-grow flex-col items-center justify-center gap-4 sm:gap-6">
+      <div className="flex flex-grow flex-col items-center justify-center gap-4 sm:gap-6 w-full">
         {game.status === "playing" && (
           <MoveSelection game={game} playerId={playerId} onMove={onMove} />
         )}

@@ -110,7 +110,8 @@ export default function App() {
     PLAYING_STATUSES.includes(status as GameStatus) && gameState;
 
   return (
-    <div className="h-dvh flex flex-col p-4 sm:p-6 lg:p-8 bg-[#f9efda] overflow-hidden">
+    <div className="min-h-dvh bg-[#f9efda]">
+    <div className="h-dvh flex flex-col p-4 overflow-hidden max-w-sm mx-auto w-full">
       <img
         src="/images/logo.png"
         alt="RPS Arena"
@@ -145,6 +146,7 @@ export default function App() {
           />
         )}
       </div>
+    </div>
     </div>
   );
 }

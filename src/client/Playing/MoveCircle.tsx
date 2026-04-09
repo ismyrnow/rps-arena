@@ -35,7 +35,7 @@ const MoveButton: React.FC<{
 
 export default function MoveCircle({ myMove, onMove }: Props) {
   return (
-    <div className="w-[60vw] h-[60vw] relative">
+    <div className="w-[60%] aspect-square relative">
       <MoveButton
         move={"rock"}
         onClick={onMove}
@@ -48,14 +48,14 @@ export default function MoveCircle({ myMove, onMove }: Props) {
         onClick={onMove}
         disabled={!!myMove}
         isSelected={myMove === "paper"}
-        className="absolute left-0 bottom-0"
+        className="absolute -left-[10%] bottom-0"
       />
       <MoveButton
         move={"scissors"}
         onClick={onMove}
         disabled={!!myMove}
         isSelected={myMove === "scissors"}
-        className="absolute right-0 bottom-0"
+        className="absolute -right-[10%] bottom-0"
       />
       <img
         src="images/arrow.png"
